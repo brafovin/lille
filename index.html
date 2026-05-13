@@ -359,27 +359,41 @@
 
   let drag = null;
 
+  function getCellMetrics() {
+    const a = cellEls[0][0].getBoundingClientRect();
+    const b = cellEls[0][1].getBoundingClientRect();
+    const c = cellEls[1][0].getBoundingClientRect();
+    return {
+      cellSize: a.width,
+      stepX: b.left - a.left,
+      stepY: c.top - a.top,
+      originX: a.left,
+      originY: a.top,
+    };
+  }
+
   function attachDrag(el, shape, idx) {
     el.addEventListener('pointerdown', (e) => {
       if (el.classList.contains('used')) return;
       e.preventDefault();
-      const rect = el.getBoundingClientRect();
-      const cellSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
+      const m = getCellMetrics();
       drag = {
         shape, idx, el,
-        offsetX: rect.width / 2,
-        offsetY: rect.height + 20,
-        cellSize,
+        metrics: m,
         ghost: null,
       };
       el.classList.add('dragging');
       const ghost = document.createElement('div');
       ghost.className = 'drag-ghost';
-      ghost.style.gridTemplateColumns = `repeat(${shape[0].length}, var(--cell))`;
+      ghost.style.gridTemplateColumns = `repeat(${shape[0].length}, ${m.cellSize}px)`;
+      ghost.style.gridAutoRows = `${m.cellSize}px`;
+      ghost.style.gap = (m.stepX - m.cellSize) + 'px';
       for (let r = 0; r < shape.length; r++) {
         for (let c = 0; c < shape[0].length; c++) {
           const cc = document.createElement('div');
           cc.className = 'pcell' + (shape[r][c] ? ' on' : '');
+          cc.style.width = m.cellSize + 'px';
+          cc.style.height = m.cellSize + 'px';
           ghost.appendChild(cc);
         }
       }
@@ -391,9 +405,11 @@
 
   function moveDrag(x, y) {
     if (!drag) return;
-    const { ghost, shape, cellSize } = drag;
-    const gx = x - (shape[0].length * cellSize) / 2;
-    const gy = y - (shape.length * cellSize) - 30;
+    const { ghost, shape, metrics } = drag;
+    const w = shape[0].length * metrics.stepX - (metrics.stepX - metrics.cellSize);
+    const h = shape.length * metrics.stepY - (metrics.stepY - metrics.cellSize);
+    const gx = x - w / 2;
+    const gy = y - h - 40;
     ghost.style.left = gx + 'px';
     ghost.style.top = gy + 'px';
     updatePreview(gx, gy);
@@ -401,16 +417,11 @@
 
   function getDropCell(gx, gy) {
     if (!drag) return null;
-    const { shape, cellSize } = drag;
-    const gridRect = gridEl.getBoundingClientRect();
-    const gap = 4;
-    const padding = 4;
-    const stepX = cellSize + gap;
-    const stepY = cellSize + gap;
-    const relX = gx - gridRect.left - padding;
-    const relY = gy - gridRect.top - padding;
-    const c = Math.round(relX / stepX);
-    const r = Math.round(relY / stepY);
+    const { shape, metrics } = drag;
+    const relX = gx - metrics.originX;
+    const relY = gy - metrics.originY;
+    const c = Math.round(relX / metrics.stepX);
+    const r = Math.round(relY / metrics.stepY);
     if (r < 0 || c < 0 || r + shape.length > GRID_SIZE || c + shape[0].length > GRID_SIZE) return null;
     return { r, c };
   }
@@ -459,8 +470,10 @@
 
   function endDrag(x, y) {
     if (!drag) return;
-    const { shape, idx, el, ghost } = drag;
-    const pos = getDropCell(x - drag.cellSize * shape[0].length / 2, y - drag.cellSize * shape.length - 30);
+    const { shape, idx, el, ghost, metrics } = drag;
+    const w = shape[0].length * metrics.stepX - (metrics.stepX - metrics.cellSize);
+    const h = shape.length * metrics.stepY - (metrics.stepY - metrics.cellSize);
+    const pos = getDropCell(x - w / 2, y - h - 40);
     let placed = false;
     if (pos && canPlace(shape, pos.r, pos.c)) {
       placePiece(shape, pos.r, pos.c);
