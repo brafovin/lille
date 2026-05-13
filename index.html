@@ -3,586 +3,1033 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Pink Blast</title>
+<title>Barbie Brawl - Pink Arena</title>
 <style>
   :root {
-    --cell: min(10vw, 52px);
-    --gap: 4px;
-    --bg: #2a0a1f;
-    --bg2: #4a1233;
-    --grid-bg: #3a0f28;
-    --grid-cell: #50173a;
-    --pink-1: #ff4fa3;
-    --pink-2: #ff8fc6;
-    --pink-3: #ffc1e0;
-    --pink-deep: #c9277a;
-    --text: #ffe5f1;
+    --pink-bg: #ffd1ec;
+    --pink-mid: #ff8ec7;
+    --pink-deep: #d63384;
+    --pink-dark: #6a1b4d;
+    --text: #fff;
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
   html, body {
     margin: 0; padding: 0;
-    min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: radial-gradient(circle at 50% 0%, var(--bg2), var(--bg) 70%);
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 30%, #ffb3da, #d63384 80%);
+    font-family: -apple-system, "Segoe UI", sans-serif;
     color: var(--text);
-    overflow-x: hidden;
-    user-select: none;
-    -webkit-user-select: none;
     touch-action: none;
   }
-  .app {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 16px 8px 24px;
-    gap: 16px;
+  #game {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    background: var(--pink-bg);
   }
-  header {
-    width: 100%;
-    max-width: 480px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 8px;
+  .overlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: rgba(106, 27, 77, 0.9);
+    z-index: 10;
+    padding: 20px;
+    text-align: center;
   }
-  h1 {
-    margin: 0;
-    font-size: 1.4rem;
+  .overlay h1 {
+    font-size: clamp(2rem, 7vw, 4rem);
+    margin: 0 0 10px;
+    color: #fff;
+    text-shadow: 3px 3px 0 var(--pink-deep), 6px 6px 0 rgba(0,0,0,0.2);
     letter-spacing: 2px;
-    color: var(--pink-2);
-    text-shadow: 0 0 18px rgba(255, 79, 163, 0.7);
   }
-  .scores { display: flex; gap: 16px; font-size: 0.95rem; }
-  .score { text-align: right; }
-  .score .label { font-size: 0.7rem; opacity: 0.7; letter-spacing: 1px; }
-  .score .value { font-weight: bold; color: var(--pink-3); font-size: 1.1rem; }
-
-  .grid {
+  .overlay p {
+    font-size: 1rem;
+    margin: 6px 0 20px;
+    max-width: 420px;
+    line-height: 1.4;
+  }
+  .brawler-grid {
     display: grid;
-    grid-template-columns: repeat(8, var(--cell));
-    grid-template-rows: repeat(8, var(--cell));
-    gap: var(--gap);
-    padding: var(--gap);
-    background: var(--grid-bg);
-    border-radius: 14px;
-    box-shadow:
-      inset 0 0 24px rgba(0,0,0,0.4),
-      0 0 32px rgba(255, 79, 163, 0.25);
-  }
-  .grid-cell {
-    width: var(--cell); height: var(--cell);
-    background: var(--grid-cell);
-    border-radius: 50%;
-    position: relative;
-    transition: background 0.15s;
-  }
-  .grid-cell.preview-ok::after {
-    content: "";
-    position: absolute; inset: 6%;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, var(--pink-2), var(--pink-deep));
-    opacity: 0.55;
-  }
-  .grid-cell.preview-bad::after {
-    content: "";
-    position: absolute; inset: 6%;
-    border-radius: 50%;
-    background: #6b2030;
-    opacity: 0.7;
-  }
-  .grid-cell.filled {
-    background: transparent;
-  }
-  .grid-cell.filled::before {
-    content: "";
-    position: absolute; inset: 4%;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 35% 28%, var(--pink-3), var(--pink-1) 55%, var(--pink-deep) 100%);
-    box-shadow:
-      inset 0 -4px 8px rgba(0,0,0,0.25),
-      0 0 12px rgba(255, 143, 198, 0.6);
-  }
-  .grid-cell.clearing::before {
-    animation: pop 0.4s ease-out forwards;
-  }
-  @keyframes pop {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 30px var(--pink-2); }
-    100% { transform: scale(0); opacity: 0; }
-  }
-
-  .tray {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-start;
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 12px;
+    max-width: 500px;
     width: 100%;
-    max-width: 480px;
-    padding: 12px;
-    background: rgba(255, 79, 163, 0.05);
-    border-radius: 14px;
-    min-height: calc(var(--cell) * 3.5);
+    margin: 12px 0 18px;
   }
-  .piece {
-    display: grid;
-    gap: 3px;
-    cursor: grab;
-    transition: opacity 0.2s, transform 0.2s;
-    touch-action: none;
-  }
-  .piece.dragging { opacity: 0.3; }
-  .piece.used { opacity: 0; pointer-events: none; }
-  .piece .pcell {
-    width: calc(var(--cell) * 0.62);
-    height: calc(var(--cell) * 0.62);
-    border-radius: 50%;
-  }
-  .piece .pcell.on {
-    background:
-      radial-gradient(circle at 35% 28%, var(--pink-3), var(--pink-1) 55%, var(--pink-deep) 100%);
-    box-shadow:
-      inset 0 -3px 5px rgba(0,0,0,0.25),
-      0 0 8px rgba(255, 143, 198, 0.5);
-  }
-
-  .drag-ghost {
-    position: fixed;
-    pointer-events: none;
-    z-index: 1000;
-    display: grid;
-    gap: 4px;
-    transition: none;
-  }
-  .drag-ghost .pcell {
-    width: var(--cell); height: var(--cell);
-    border-radius: 50%;
-  }
-  .drag-ghost .pcell.on {
-    background:
-      radial-gradient(circle at 35% 28%, var(--pink-3), var(--pink-1) 55%, var(--pink-deep) 100%);
-    box-shadow:
-      inset 0 -4px 8px rgba(0,0,0,0.25),
-      0 0 16px rgba(255, 143, 198, 0.7);
-  }
-
-  button {
-    background: var(--pink-1);
-    color: white;
-    border: none;
-    border-radius: 24px;
-    padding: 10px 20px;
-    font-weight: bold;
+  .brawler-card {
+    background: linear-gradient(160deg, #ff8ec7, #d63384);
+    border: 3px solid #fff;
+    border-radius: 16px;
+    padding: 10px 8px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 79, 163, 0.4);
+    transition: transform 0.15s;
+    display: flex; flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+  }
+  .brawler-card:hover, .brawler-card.selected {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 0 rgba(0,0,0,0.25);
+    border-color: #fff700;
+  }
+  .brawler-card canvas {
+    width: 64px; height: 64px;
+    image-rendering: pixelated;
+  }
+  .brawler-card .name {
+    font-weight: bold; font-size: 0.95rem; margin-top: 4px;
+  }
+  .brawler-card .desc {
+    font-size: 0.7rem; opacity: 0.9; margin-top: 2px;
+  }
+  button.play {
+    background: linear-gradient(180deg, #ffe44f, #ff9d29);
+    color: var(--pink-dark);
+    font-weight: 900;
+    font-size: 1.3rem;
+    border: 3px solid #fff;
+    padding: 14px 40px;
+    border-radius: 14px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+  }
+  button.play:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.25); }
+  .hud {
+    position: fixed;
+    top: 10px; left: 10px; right: 10px;
+    display: flex; justify-content: space-between;
+    pointer-events: none;
+    z-index: 5;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  }
+  .hud .stat {
+    background: rgba(106,27,77,0.7);
+    padding: 6px 12px;
+    border-radius: 10px;
+    border: 2px solid #fff;
     font-size: 0.9rem;
   }
-  button:active { transform: translateY(1px); }
-
-  .overlay {
+  .joystick, .shoot-btn {
     position: fixed;
-    inset: 0;
-    background: rgba(42, 10, 31, 0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(6px);
+    bottom: 30px;
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 3px solid rgba(255,255,255,0.5);
+    z-index: 6;
+    touch-action: none;
   }
-  .overlay.show { display: flex; }
-  .modal {
-    background: linear-gradient(160deg, var(--bg2), var(--bg));
-    border: 2px solid var(--pink-1);
-    border-radius: 18px;
-    padding: 28px 32px;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(255, 79, 163, 0.5);
-  }
-  .modal h2 { margin: 0 0 8px; color: var(--pink-2); }
-  .modal p { margin: 8px 0 20px; }
-
-  .combo-flash {
-    position: fixed;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+  .joystick { left: 20px; }
+  .shoot-btn {
+    right: 20px;
+    background: rgba(255, 80, 150, 0.4);
+    display: flex; align-items: center; justify-content: center;
     font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--pink-2);
-    text-shadow: 0 0 20px var(--pink-1);
+  }
+  .joystick .knob {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 55px; height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.7);
+    transform: translate(-50%, -50%);
     pointer-events: none;
-    opacity: 0;
-    z-index: 1500;
   }
-  .combo-flash.show {
-    animation: flash 1s ease-out forwards;
+  .super-btn {
+    position: fixed;
+    bottom: 175px; right: 30px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 217, 0, 0.3);
+    border: 3px solid #ffd900;
+    z-index: 6;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    opacity: 0.5;
   }
-  @keyframes flash {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-    100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
+  .super-btn.ready { opacity: 1; animation: pulse 1s infinite; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .hidden { display: none !important; }
+  .badge {
+    display: inline-block;
+    background: #ffd900;
+    color: var(--pink-dark);
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-left: 4px;
+  }
+  @media (hover: hover) {
+    .joystick, .shoot-btn, .super-btn { display: none; }
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <h1>PINK BLAST</h1>
-    <div class="scores">
-      <div class="score">
-        <div class="label">SCORE</div>
-        <div class="value" id="score">0</div>
-      </div>
-      <div class="score">
-        <div class="label">BEST</div>
-        <div class="value" id="best">0</div>
-      </div>
-    </div>
-  </header>
 
-  <div class="grid" id="grid"></div>
-  <div class="tray" id="tray"></div>
-  <button id="restart">Neu starten</button>
+<canvas id="game"></canvas>
+
+<div class="hud hidden" id="hud">
+  <div class="stat" id="hpStat">HP 100</div>
+  <div class="stat" id="scoreStat">Barbies KO: 0</div>
+  <div class="stat" id="superStat">Super 0%</div>
 </div>
 
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h2>Game Over</h2>
-    <p>Score: <span id="finalScore">0</span></p>
-    <button id="playAgain">Nochmal spielen</button>
-  </div>
+<div class="joystick hidden" id="joyMove"><div class="knob"></div></div>
+<div class="shoot-btn hidden" id="btnShoot">🍼</div>
+<div class="super-btn hidden" id="btnSuper">⭐</div>
+
+<div class="overlay" id="menu">
+  <h1>👛 Barbie Brawl 👛</h1>
+  <p>Wähle deine Barbie-Brawlerin und kämpfe in der pinken Arena! WASD = bewegen, Maus = zielen, Klick = schießen, Leertaste = Super. Mobil: Joysticks unten.</p>
+  <div class="brawler-grid" id="brawlerGrid"></div>
+  <button class="play" id="btnPlay">SPIELEN</button>
 </div>
 
-<div class="combo-flash" id="combo"></div>
+<div class="overlay hidden" id="endScreen">
+  <h1 id="endTitle">Sieg!</h1>
+  <p id="endText">Du hast die pinke Arena erobert!</p>
+  <button class="play" id="btnRestart">NOCHMAL</button>
+</div>
 
 <script>
 (() => {
-  const GRID_SIZE = 8;
-  const PIECES = [
-    [[1]],
-    [[1,1]],
-    [[1],[1]],
-    [[1,1,1]],
-    [[1],[1],[1]],
-    [[1,1,1,1]],
-    [[1],[1],[1],[1]],
-    [[1,1,1,1,1]],
-    [[1],[1],[1],[1],[1]],
-    [[1,1],[1,1]],
-    [[1,1,1],[1,1,1],[1,1,1]],
-    [[1,0],[1,1]],
-    [[0,1],[1,1]],
-    [[1,1],[1,0]],
-    [[1,1],[0,1]],
-    [[1,0,0],[1,0,0],[1,1,1]],
-    [[0,0,1],[0,0,1],[1,1,1]],
-    [[1,1,1],[1,0,0],[1,0,0]],
-    [[1,1,1],[0,0,1],[0,0,1]],
-    [[1,1,1],[0,1,0]],
-    [[0,1,0],[1,1,1]],
-    [[1,0],[1,1],[1,0]],
-    [[0,1],[1,1],[0,1]],
-    [[1,1,0],[0,1,1]],
-    [[0,1,1],[1,1,0]],
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0;
+  function resize() {
+    W = canvas.width = window.innerWidth * devicePixelRatio;
+    H = canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ====== Brawler definitions: barbie figures ======
+  const BRAWLERS = [
+    { id: 'pinky',  name: 'Stella',  hair: '#ffd84d', dress: '#ff4fa3', skin: '#ffd8b5', hp: 100, speed: 2.6, fireRate: 280, projSpeed: 9,  dmg: 18, projSize: 7,  spread: 0.05, desc: 'Ausgewogen' },
+    { id: 'tank',   name: 'Roxy',    hair: '#3d1a14', dress: '#7d2b5e', skin: '#e8b89a', hp: 160, speed: 2.1, fireRate: 420, projSpeed: 7,  dmg: 28, projSize: 11, spread: 0.08, desc: 'Tank' },
+    { id: 'speedy', name: 'Skyler',  hair: '#ff8ec7', dress: '#fff700', skin: '#ffe1c4', hp: 75,  speed: 3.5, fireRate: 180, projSpeed: 11, dmg: 12, projSize: 5,  spread: 0.04, desc: 'Schnell' },
+    { id: 'shot',   name: 'Coco',    hair: '#5b2a8a', dress: '#ff9d29', skin: '#fbd5b0', hp: 90,  speed: 2.4, fireRate: 600, projSpeed: 8,  dmg: 14, projSize: 6,  spread: 0.35, desc: 'Schrot' },
   ];
+  let selectedBrawlerId = 'pinky';
 
-  const gridEl = document.getElementById('grid');
-  const trayEl = document.getElementById('tray');
-  const scoreEl = document.getElementById('score');
-  const bestEl = document.getElementById('best');
-  const overlayEl = document.getElementById('overlay');
-  const finalScoreEl = document.getElementById('finalScore');
-  const comboEl = document.getElementById('combo');
+  // ====== Render a barbie figure ======
+  function drawBaby(ctx, x, y, r, brawler, facing = 0, blink = false) {
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 1.05, r * 0.7, r * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
 
-  let board = [];
-  let score = 0;
-  let best = +localStorage.getItem('pinkblast_best') || 0;
-  let currentPieces = [];
-  let cellEls = [];
+    // High heels
+    ctx.fillStyle = '#c01a5a';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
+    ctx.fill();
 
-  function init() {
-    board = Array.from({length: GRID_SIZE}, () => Array(GRID_SIZE).fill(0));
-    score = 0;
-    cellEls = [];
-    gridEl.innerHTML = '';
-    for (let r = 0; r < GRID_SIZE; r++) {
-      cellEls[r] = [];
-      for (let c = 0; c < GRID_SIZE; c++) {
-        const cell = document.createElement('div');
-        cell.className = 'grid-cell';
-        cell.dataset.r = r;
-        cell.dataset.c = c;
-        gridEl.appendChild(cell);
-        cellEls[r][c] = cell;
-      }
+    // Legs (slim)
+    ctx.fillStyle = brawler.skin;
+    ctx.fillRect(x - r * 0.25, y + r * 0.55, r * 0.14, r * 0.45);
+    ctx.fillRect(x + r * 0.11, y + r * 0.55, r * 0.14, r * 0.45);
+
+    // Dress (skirt - triangular flare)
+    ctx.fillStyle = brawler.dress;
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.32, y + r * 0.15);
+    ctx.lineTo(x + r * 0.32, y + r * 0.15);
+    ctx.lineTo(x + r * 0.55, y + r * 0.62);
+    ctx.lineTo(x - r * 0.55, y + r * 0.62);
+    ctx.closePath();
+    ctx.fill();
+    // Dress sparkle
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.beginPath();
+    ctx.arc(x - r * 0.2, y + r * 0.35, r * 0.04, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.15, y + r * 0.45, r * 0.04, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.3, y + r * 0.3, r * 0.03, 0, Math.PI * 2);
+    ctx.fill();
+    // Dress trim
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - r * 0.55, y + r * 0.58, r * 1.1, r * 0.05);
+
+    // Torso (slim waist)
+    ctx.fillStyle = brawler.dress;
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.32, y - r * 0.05);
+    ctx.lineTo(x + r * 0.32, y - r * 0.05);
+    ctx.lineTo(x + r * 0.3, y + r * 0.18);
+    ctx.lineTo(x - r * 0.3, y + r * 0.18);
+    ctx.closePath();
+    ctx.fill();
+
+    // Arms (slim)
+    ctx.fillStyle = brawler.skin;
+    ctx.fillRect(x - r * 0.45, y - r * 0.05, r * 0.13, r * 0.4);
+    ctx.fillRect(x + r * 0.32, y - r * 0.05, r * 0.13, r * 0.4);
+    // Hands
+    ctx.beginPath();
+    ctx.arc(x - r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Long hair behind head
+    ctx.fillStyle = brawler.hair;
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 0.05, r * 0.6, r * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Hair extends down
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.55, y - r * 0.1);
+    ctx.lineTo(x - r * 0.45, y + r * 0.5);
+    ctx.lineTo(x - r * 0.2, y + r * 0.4);
+    ctx.lineTo(x - r * 0.25, y - r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + r * 0.55, y - r * 0.1);
+    ctx.lineTo(x + r * 0.45, y + r * 0.5);
+    ctx.lineTo(x + r * 0.2, y + r * 0.4);
+    ctx.lineTo(x + r * 0.25, y - r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = brawler.skin;
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.25, r * 0.42, r * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair top (fringe / bangs)
+    ctx.fillStyle = brawler.hair;
+    ctx.beginPath();
+    ctx.arc(x, y - r * 0.45, r * 0.45, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // Fringe sweep
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.42, y - r * 0.4);
+    ctx.quadraticCurveTo(x - r * 0.1, y - r * 0.15, x + r * 0.42, y - r * 0.35);
+    ctx.quadraticCurveTo(x + r * 0.2, y - r * 0.5, x - r * 0.42, y - r * 0.4);
+    ctx.fill();
+    // Hair shine
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.15, y - r * 0.55, r * 0.1, r * 0.04, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyeshadow
+    ctx.fillStyle = brawler.dress;
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Eyes
+    const eyeOffset = Math.cos(facing) * r * 0.05;
+    const eyeY = y - r * 0.22 + Math.sin(facing) * r * 0.05;
+    if (blink) {
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.25 + eyeOffset, eyeY);
+      ctx.lineTo(x - r * 0.1 + eyeOffset, eyeY);
+      ctx.moveTo(x + r * 0.1 + eyeOffset, eyeY);
+      ctx.lineTo(x + r * 0.25 + eyeOffset, eyeY);
+      ctx.stroke();
+    } else {
+      // White of eye
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(x - r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Iris (matches dress for fun)
+      ctx.fillStyle = '#3a6ec9';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupil
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
+      ctx.fill();
+      // Shine
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.15 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.19 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
+      ctx.fill();
+      // Lashes
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.24 + eyeOffset, eyeY - r * 0.08);
+      ctx.lineTo(x - r * 0.27 + eyeOffset, eyeY - r * 0.13);
+      ctx.moveTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.1);
+      ctx.lineTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.16);
+      ctx.moveTo(x + r * 0.24 + eyeOffset, eyeY - r * 0.08);
+      ctx.lineTo(x + r * 0.27 + eyeOffset, eyeY - r * 0.13);
+      ctx.moveTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.1);
+      ctx.lineTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.16);
+      ctx.stroke();
     }
-    bestEl.textContent = best;
-    updateScore(0);
-    spawnPieces();
-    overlayEl.classList.remove('show');
+
+    // Blush
+    ctx.fillStyle = 'rgba(255, 100, 150, 0.4)';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Lipstick smile
+    ctx.fillStyle = '#d63384';
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.02, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff8ec7';
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.02, r * 0.06, r * 0.02, 0, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  function updateScore(delta) {
-    score += delta;
-    scoreEl.textContent = score;
-    if (score > best) {
-      best = score;
-      bestEl.textContent = best;
-      localStorage.setItem('pinkblast_best', best);
+  // ====== Build brawler selection cards ======
+  const grid = document.getElementById('brawlerGrid');
+  BRAWLERS.forEach((b, i) => {
+    const card = document.createElement('div');
+    card.className = 'brawler-card' + (b.id === selectedBrawlerId ? ' selected' : '');
+    card.dataset.id = b.id;
+    const cv = document.createElement('canvas');
+    cv.width = 128; cv.height = 128;
+    const cctx = cv.getContext('2d');
+    drawBaby(cctx, 64, 64, 38, b, 0);
+    card.appendChild(cv);
+    const nm = document.createElement('div');
+    nm.className = 'name';
+    nm.textContent = b.name;
+    card.appendChild(nm);
+    const ds = document.createElement('div');
+    ds.className = 'desc';
+    ds.textContent = b.desc;
+    card.appendChild(ds);
+    card.addEventListener('click', () => {
+      selectedBrawlerId = b.id;
+      [...grid.children].forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+    });
+    grid.appendChild(card);
+  });
+
+  // ====== World / Arena ======
+  const TILE = 64;
+  const MAP_W = 24, MAP_H = 18;
+  // 0 = floor, 1 = wall, 2 = bush
+  let map = [];
+  function generateMap() {
+    map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(0));
+    for (let x = 0; x < MAP_W; x++) {
+      map[0][x] = 1;
+      map[MAP_H - 1][x] = 1;
     }
+    for (let y = 0; y < MAP_H; y++) {
+      map[y][0] = 1;
+      map[y][MAP_W - 1] = 1;
+    }
+    // Symmetric obstacles
+    const obstacles = [
+      [4,3],[5,3],[6,3],
+      [4,14],[5,14],[6,14],
+      [17,3],[18,3],[19,3],
+      [17,14],[18,14],[19,14],
+      [11,8],[12,8],[11,9],[12,9],
+      [3,7],[3,8],[3,9],[3,10],
+      [20,7],[20,8],[20,9],[20,10],
+      [11,3],[12,3],[11,14],[12,14],
+    ];
+    obstacles.forEach(([x,y]) => { if (map[y] && map[y][x] !== undefined) map[y][x] = 1; });
+    // Bushes
+    const bushes = [
+      [7,6],[8,6],[15,6],[16,6],
+      [7,11],[8,11],[15,11],[16,11],
+      [11,5],[12,5],[11,12],[12,12],
+      [2,2],[21,2],[2,15],[21,15],
+    ];
+    bushes.forEach(([x,y]) => { if (map[y] && map[y][x] !== undefined) map[y][x] = 2; });
   }
 
-  function spawnPieces() {
-    currentPieces = [];
-    trayEl.innerHTML = '';
-    for (let i = 0; i < 3; i++) {
-      const shape = PIECES[Math.floor(Math.random() * PIECES.length)];
-      currentPieces.push(shape);
-      trayEl.appendChild(renderPiece(shape, i));
-    }
-    checkGameOver();
-  }
+  // ====== Game state ======
+  let game = null;
 
-  function renderPiece(shape, idx) {
-    const el = document.createElement('div');
-    el.className = 'piece';
-    el.style.gridTemplateColumns = `repeat(${shape[0].length}, calc(var(--cell) * 0.62))`;
-    el.dataset.idx = idx;
-    for (let r = 0; r < shape.length; r++) {
-      for (let c = 0; c < shape[0].length; c++) {
-        const cell = document.createElement('div');
-        cell.className = 'pcell' + (shape[r][c] ? ' on' : '');
-        el.appendChild(cell);
-      }
-    }
-    attachDrag(el, shape, idx);
-    return el;
-  }
-
-  let drag = null;
-
-  function getCellMetrics() {
-    const a = cellEls[0][0].getBoundingClientRect();
-    const b = cellEls[0][1].getBoundingClientRect();
-    const c = cellEls[1][0].getBoundingClientRect();
+  function createGame() {
+    generateMap();
+    const me = makeBrawler(selectedBrawlerId, TILE * 3, TILE * 9, true);
+    const enemies = [];
+    const enemyIds = BRAWLERS.filter(b => b.id !== selectedBrawlerId).map(b => b.id);
+    const spawns = [[TILE*20, TILE*9], [TILE*11, TILE*3], [TILE*12, TILE*14]];
+    spawns.forEach((s, i) => {
+      enemies.push(makeBrawler(enemyIds[i % enemyIds.length], s[0], s[1], false));
+    });
     return {
-      cellSize: a.width,
-      stepX: b.left - a.left,
-      stepY: c.top - a.top,
-      originX: a.left,
-      originY: a.top,
+      me, enemies,
+      projectiles: [],
+      particles: [],
+      camera: { x: me.x, y: me.y },
+      score: 0,
+      over: false,
+      time: 0,
     };
   }
 
-  function attachDrag(el, shape, idx) {
-    el.addEventListener('pointerdown', (e) => {
-      if (el.classList.contains('used')) return;
-      e.preventDefault();
-      const m = getCellMetrics();
-      drag = {
-        shape, idx, el,
-        metrics: m,
-        ghost: null,
-      };
-      el.classList.add('dragging');
-      const ghost = document.createElement('div');
-      ghost.className = 'drag-ghost';
-      ghost.style.gridTemplateColumns = `repeat(${shape[0].length}, ${m.cellSize}px)`;
-      ghost.style.gridAutoRows = `${m.cellSize}px`;
-      ghost.style.gap = (m.stepX - m.cellSize) + 'px';
-      for (let r = 0; r < shape.length; r++) {
-        for (let c = 0; c < shape[0].length; c++) {
-          const cc = document.createElement('div');
-          cc.className = 'pcell' + (shape[r][c] ? ' on' : '');
-          cc.style.width = m.cellSize + 'px';
-          cc.style.height = m.cellSize + 'px';
-          ghost.appendChild(cc);
+  function makeBrawler(id, x, y, isPlayer) {
+    const def = BRAWLERS.find(b => b.id === id);
+    return {
+      def, id,
+      x, y, vx: 0, vy: 0,
+      r: 22,
+      hp: def.hp, maxHp: def.hp,
+      facing: 0,
+      aim: 0,
+      lastShot: 0,
+      isPlayer,
+      alive: true,
+      respawnAt: 0,
+      blink: 0,
+      super: 0,
+      aiState: { target: null, changeDir: 0, mvx: 0, mvy: 0, fireDelay: 0 },
+      hitFlash: 0,
+    };
+  }
+
+  // ====== Input ======
+  const keys = {};
+  let mouse = { x: 0, y: 0, down: false };
+  window.addEventListener('keydown', e => {
+    keys[e.key.toLowerCase()] = true;
+    if (e.key === ' ' && game && game.me.alive && game.me.super >= 100) {
+      fireSuper(game.me);
+    }
+  });
+  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = (e.clientX - rect.left) * devicePixelRatio;
+    mouse.y = (e.clientY - rect.top) * devicePixelRatio;
+  });
+  canvas.addEventListener('mousedown', () => { mouse.down = true; });
+  canvas.addEventListener('mouseup', () => { mouse.down = false; });
+
+  // Touch joystick
+  const joy = { active: false, id: null, sx: 0, sy: 0, dx: 0, dy: 0 };
+  const joyEl = document.getElementById('joyMove');
+  const joyKnob = joyEl.querySelector('.knob');
+  joyEl.addEventListener('touchstart', e => {
+    const t = e.changedTouches[0];
+    joy.active = true; joy.id = t.identifier;
+    const rect = joyEl.getBoundingClientRect();
+    joy.sx = rect.left + rect.width / 2;
+    joy.sy = rect.top + rect.height / 2;
+    updateJoy(t.clientX, t.clientY);
+  });
+  joyEl.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joy.id) updateJoy(t.clientX, t.clientY);
+    }
+    e.preventDefault();
+  }, { passive: false });
+  joyEl.addEventListener('touchend', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === joy.id) { joy.active = false; joy.dx = 0; joy.dy = 0; joyKnob.style.transform = 'translate(-50%,-50%)'; }
+    }
+  });
+  function updateJoy(cx, cy) {
+    let dx = cx - joy.sx, dy = cy - joy.sy;
+    const max = 50;
+    const d = Math.hypot(dx, dy);
+    if (d > max) { dx = dx * max / d; dy = dy * max / d; }
+    joy.dx = dx / max; joy.dy = dy / max;
+    joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+  }
+  const shootBtn = document.getElementById('btnShoot');
+  let touchShoot = false;
+  shootBtn.addEventListener('touchstart', e => { touchShoot = true; e.preventDefault(); }, { passive: false });
+  shootBtn.addEventListener('touchend', () => { touchShoot = false; });
+  const superBtn = document.getElementById('btnSuper');
+  superBtn.addEventListener('touchstart', e => {
+    if (game && game.me.alive && game.me.super >= 100) fireSuper(game.me);
+    e.preventDefault();
+  }, { passive: false });
+
+  // ====== Physics & collision ======
+  function tileAt(x, y) {
+    const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE);
+    if (ty < 0 || ty >= MAP_H || tx < 0 || tx >= MAP_W) return 1;
+    return map[ty][tx];
+  }
+  function isWall(x, y) { return tileAt(x, y) === 1; }
+
+  function moveBrawler(b, dx, dy) {
+    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 4));
+    for (let s = 0; s < steps; s++) {
+      const nx = b.x + dx / steps;
+      if (!isWall(nx + Math.sign(dx) * b.r, b.y - b.r * 0.3) &&
+          !isWall(nx + Math.sign(dx) * b.r, b.y + b.r * 0.5)) {
+        b.x = nx;
+      }
+      const ny = b.y + dy / steps;
+      if (!isWall(b.x - b.r * 0.6, ny + Math.sign(dy) * b.r * 0.8) &&
+          !isWall(b.x + b.r * 0.6, ny + Math.sign(dy) * b.r * 0.8)) {
+        b.y = ny;
+      }
+    }
+  }
+
+  // ====== Shooting ======
+  function tryShoot(b) {
+    const now = performance.now();
+    if (now - b.lastShot < b.def.fireRate) return;
+    b.lastShot = now;
+    const def = b.def;
+    const count = def.id === 'shot' ? 5 : 1;
+    for (let i = 0; i < count; i++) {
+      const spread = (Math.random() - 0.5) * def.spread + (count > 1 ? (i - (count-1)/2) * 0.12 : 0);
+      const a = b.aim + spread;
+      game.projectiles.push({
+        x: b.x + Math.cos(a) * b.r,
+        y: b.y + Math.sin(a) * b.r,
+        vx: Math.cos(a) * def.projSpeed,
+        vy: Math.sin(a) * def.projSpeed,
+        r: def.projSize,
+        dmg: def.dmg,
+        owner: b,
+        life: 60,
+        color: def.dress,
+      });
+    }
+  }
+  function fireSuper(b) {
+    b.super = 0;
+    // Big burst in 12 directions
+    for (let i = 0; i < 16; i++) {
+      const a = (i / 16) * Math.PI * 2;
+      game.projectiles.push({
+        x: b.x, y: b.y,
+        vx: Math.cos(a) * 10,
+        vy: Math.sin(a) * 10,
+        r: 12,
+        dmg: 25,
+        owner: b,
+        life: 50,
+        color: '#fff700',
+        isSuper: true,
+      });
+    }
+    for (let i = 0; i < 40; i++) {
+      game.particles.push({
+        x: b.x, y: b.y,
+        vx: (Math.random()-0.5)*8,
+        vy: (Math.random()-0.5)*8,
+        life: 30, color: '#ffd900', r: 4,
+      });
+    }
+  }
+
+  // ====== AI ======
+  function updateAI(b, dt) {
+    if (!b.alive) return;
+    const ai = b.aiState;
+    // Find closest alive target
+    const targets = [game.me, ...game.enemies].filter(t => t !== b && t.alive);
+    let best = null, bd = Infinity;
+    for (const t of targets) {
+      const d = Math.hypot(t.x - b.x, t.y - b.y);
+      if (d < bd) { bd = d; best = t; }
+    }
+    ai.target = best;
+    if (best) {
+      const dx = best.x - b.x, dy = best.y - b.y;
+      b.aim = Math.atan2(dy, dx);
+      const dist = Math.hypot(dx, dy);
+      // Movement: approach or strafe
+      ai.changeDir -= dt;
+      if (ai.changeDir <= 0) {
+        ai.changeDir = 400 + Math.random() * 800;
+        const desired = 220;
+        const a = b.aim + (Math.random() - 0.5) * 0.8;
+        if (dist > desired + 40) {
+          ai.mvx = Math.cos(a); ai.mvy = Math.sin(a);
+        } else if (dist < desired - 40) {
+          ai.mvx = -Math.cos(a); ai.mvy = -Math.sin(a);
+        } else {
+          const s = Math.random() < 0.5 ? 1 : -1;
+          ai.mvx = -Math.sin(a) * s; ai.mvy = Math.cos(a) * s;
         }
       }
-      document.body.appendChild(ghost);
-      drag.ghost = ghost;
-      moveDrag(e.clientX, e.clientY);
-    });
-  }
-
-  function moveDrag(x, y) {
-    if (!drag) return;
-    const { ghost, shape, metrics } = drag;
-    const w = shape[0].length * metrics.stepX - (metrics.stepX - metrics.cellSize);
-    const h = shape.length * metrics.stepY - (metrics.stepY - metrics.cellSize);
-    const gx = x - w / 2;
-    const gy = y - h - 40;
-    ghost.style.left = gx + 'px';
-    ghost.style.top = gy + 'px';
-    updatePreview(gx, gy);
-  }
-
-  function getDropCell(gx, gy) {
-    if (!drag) return null;
-    const { shape, metrics } = drag;
-    const relX = gx - metrics.originX;
-    const relY = gy - metrics.originY;
-    const c = Math.round(relX / metrics.stepX);
-    const r = Math.round(relY / metrics.stepY);
-    if (r < 0 || c < 0 || r + shape.length > GRID_SIZE || c + shape[0].length > GRID_SIZE) return null;
-    return { r, c };
-  }
-
-  function canPlace(shape, r, c) {
-    for (let dr = 0; dr < shape.length; dr++) {
-      for (let dc = 0; dc < shape[0].length; dc++) {
-        if (shape[dr][dc] && board[r+dr][c+dc]) return false;
+      moveBrawler(b, ai.mvx * b.def.speed * 0.85, ai.mvy * b.def.speed * 0.85);
+      b.facing = b.aim;
+      // Shoot if has line of sight (basic)
+      if (dist < 380 && hasLineOfSight(b, best)) {
+        tryShoot(b);
       }
+      // Use super when full
+      if (b.super >= 100 && dist < 200) fireSuper(b);
+    }
+  }
+  function hasLineOfSight(a, b) {
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const d = Math.hypot(dx, dy);
+    const steps = Math.ceil(d / TILE);
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const x = a.x + dx * t, y = a.y + dy * t;
+      if (tileAt(x, y) === 1) return false;
     }
     return true;
   }
 
-  function canPlaceAnywhere(shape) {
-    for (let r = 0; r <= GRID_SIZE - shape.length; r++) {
-      for (let c = 0; c <= GRID_SIZE - shape[0].length; c++) {
-        if (canPlace(shape, r, c)) return true;
-      }
-    }
-    return false;
-  }
+  // ====== Update ======
+  function update(dt) {
+    if (game.over) return;
+    game.time += dt;
+    const me = game.me;
 
-  function clearPreview() {
-    for (let r = 0; r < GRID_SIZE; r++) {
-      for (let c = 0; c < GRID_SIZE; c++) {
-        cellEls[r][c].classList.remove('preview-ok', 'preview-bad');
-      }
-    }
-  }
+    // Player input
+    if (me.alive) {
+      let mx = 0, my = 0;
+      if (keys['w'] || keys['arrowup']) my -= 1;
+      if (keys['s'] || keys['arrowdown']) my += 1;
+      if (keys['a'] || keys['arrowleft']) mx -= 1;
+      if (keys['d'] || keys['arrowright']) mx += 1;
+      if (joy.active) { mx = joy.dx; my = joy.dy; }
+      const len = Math.hypot(mx, my);
+      if (len > 1) { mx /= len; my /= len; }
+      moveBrawler(me, mx * me.def.speed, my * me.def.speed);
 
-  function updatePreview(gx, gy) {
-    clearPreview();
-    if (!drag) return;
-    const pos = getDropCell(gx, gy);
-    if (!pos) return;
-    const { shape } = drag;
-    const ok = canPlace(shape, pos.r, pos.c);
-    for (let dr = 0; dr < shape.length; dr++) {
-      for (let dc = 0; dc < shape[0].length; dc++) {
-        if (shape[dr][dc]) {
-          cellEls[pos.r + dr][pos.c + dc].classList.add(ok ? 'preview-ok' : 'preview-bad');
+      // Aim: mouse OR auto-aim to nearest enemy on mobile
+      if (joy.active || touchShoot) {
+        // auto-aim to nearest enemy
+        let best = null, bd = Infinity;
+        for (const e of game.enemies) {
+          if (!e.alive) continue;
+          const d = Math.hypot(e.x - me.x, e.y - me.y);
+          if (d < bd) { bd = d; best = e; }
         }
-      }
-    }
-  }
-
-  function endDrag(x, y) {
-    if (!drag) return;
-    const { shape, idx, el, ghost, metrics } = drag;
-    const w = shape[0].length * metrics.stepX - (metrics.stepX - metrics.cellSize);
-    const h = shape.length * metrics.stepY - (metrics.stepY - metrics.cellSize);
-    const pos = getDropCell(x - w / 2, y - h - 40);
-    let placed = false;
-    if (pos && canPlace(shape, pos.r, pos.c)) {
-      placePiece(shape, pos.r, pos.c);
-      el.classList.add('used');
-      currentPieces[idx] = null;
-      placed = true;
-    }
-    el.classList.remove('dragging');
-    ghost.remove();
-    clearPreview();
-    drag = null;
-
-    if (placed) {
-      clearLines();
-      if (currentPieces.every(p => p === null)) {
-        spawnPieces();
+        if (best) me.aim = Math.atan2(best.y - me.y, best.x - me.x);
+        else if (mx || my) me.aim = Math.atan2(my, mx);
       } else {
-        checkGameOver();
+        const wx = me.x - game.camera.x + W / 2;
+        const wy = me.y - game.camera.y + H / 2;
+        me.aim = Math.atan2(mouse.y - wy, mouse.x - wx);
+      }
+      me.facing = me.aim;
+
+      if (mouse.down || touchShoot) tryShoot(me);
+    } else {
+      me.respawnAt -= dt;
+      if (me.respawnAt <= 0) respawn(me);
+    }
+
+    // Enemies AI
+    for (const e of game.enemies) {
+      if (e.alive) updateAI(e, dt);
+      else {
+        e.respawnAt -= dt;
+        if (e.respawnAt <= 0) respawn(e);
       }
     }
-  }
 
-  function placePiece(shape, r, c) {
-    let cells = 0;
-    for (let dr = 0; dr < shape.length; dr++) {
-      for (let dc = 0; dc < shape[0].length; dc++) {
-        if (shape[dr][dc]) {
-          board[r+dr][c+dc] = 1;
-          cellEls[r+dr][c+dc].classList.add('filled');
-          cells++;
+    // Projectiles
+    for (let i = game.projectiles.length - 1; i >= 0; i--) {
+      const p = game.projectiles[i];
+      p.x += p.vx; p.y += p.vy;
+      p.life--;
+      if (p.life <= 0 || isWall(p.x, p.y)) {
+        game.projectiles.splice(i, 1);
+        for (let k = 0; k < 6; k++) {
+          game.particles.push({
+            x: p.x, y: p.y,
+            vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4,
+            life: 15, color: p.color, r: 2 + Math.random() * 2,
+          });
+        }
+        continue;
+      }
+      // Hit detection
+      const targets = [game.me, ...game.enemies];
+      for (const t of targets) {
+        if (!t.alive || t === p.owner) continue;
+        if (Math.hypot(t.x - p.x, t.y - p.y) < t.r + p.r) {
+          t.hp -= p.dmg;
+          t.hitFlash = 8;
+          // Super charge
+          if (p.owner) p.owner.super = Math.min(100, p.owner.super + (p.isSuper ? 5 : 12));
+          // particles
+          for (let k = 0; k < 8; k++) {
+            game.particles.push({
+              x: p.x, y: p.y,
+              vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5,
+              life: 20, color: '#ff4fa3', r: 2 + Math.random() * 3,
+            });
+          }
+          if (t.hp <= 0) {
+            t.alive = false;
+            t.respawnAt = 3000;
+            // Big particles
+            for (let k = 0; k < 30; k++) {
+              game.particles.push({
+                x: t.x, y: t.y,
+                vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8,
+                life: 40, color: ['#ff4fa3','#ffd900','#fff'][k%3], r: 3 + Math.random() * 4,
+              });
+            }
+            if (p.owner === me) {
+              game.score++;
+              if (game.score >= 5) endGame(true);
+            } else if (t === me) {
+              if (game.score < -2) endGame(false);
+            }
+          }
+          game.projectiles.splice(i, 1);
+          break;
         }
       }
     }
-    updateScore(cells);
-  }
 
-  function clearLines() {
-    const rowsToClear = [];
-    const colsToClear = [];
-    for (let r = 0; r < GRID_SIZE; r++) {
-      if (board[r].every(v => v)) rowsToClear.push(r);
+    // Particles
+    for (let i = game.particles.length - 1; i >= 0; i--) {
+      const pa = game.particles[i];
+      pa.x += pa.vx; pa.y += pa.vy;
+      pa.vx *= 0.92; pa.vy *= 0.92;
+      pa.life--;
+      if (pa.life <= 0) game.particles.splice(i, 1);
     }
-    for (let c = 0; c < GRID_SIZE; c++) {
-      let full = true;
-      for (let r = 0; r < GRID_SIZE; r++) if (!board[r][c]) { full = false; break; }
-      if (full) colsToClear.push(c);
-    }
-    const total = rowsToClear.length + colsToClear.length;
-    if (total === 0) return;
 
-    const toClear = new Set();
-    rowsToClear.forEach(r => { for (let c = 0; c < GRID_SIZE; c++) toClear.add(r + ',' + c); });
-    colsToClear.forEach(c => { for (let r = 0; r < GRID_SIZE; r++) toClear.add(r + ',' + c); });
+    // Hit flashes
+    for (const b of [me, ...game.enemies]) if (b.hitFlash > 0) b.hitFlash--;
 
-    toClear.forEach(k => {
-      const [r, c] = k.split(',').map(Number);
-      cellEls[r][c].classList.add('clearing');
-    });
+    // Camera follow
+    game.camera.x += (me.x - game.camera.x) * 0.1;
+    game.camera.y += (me.y - game.camera.y) * 0.1;
 
-    setTimeout(() => {
-      toClear.forEach(k => {
-        const [r, c] = k.split(',').map(Number);
-        board[r][c] = 0;
-        cellEls[r][c].classList.remove('filled', 'clearing');
-      });
-    }, 400);
-
-    const bonus = total === 1 ? 10 : total * 18;
-    updateScore(bonus);
-    if (total >= 2) flashCombo(`COMBO x${total}!`);
-    else flashCombo('CLEAR!');
+    // HUD
+    document.getElementById('hpStat').textContent = me.alive ? `HP ${Math.max(0, Math.ceil(me.hp))}` : `RESPAWN ${(me.respawnAt/1000).toFixed(1)}s`;
+    document.getElementById('scoreStat').textContent = `KOs: ${game.score}/5`;
+    document.getElementById('superStat').textContent = `Super ${Math.floor(me.super)}%`;
+    superBtn.classList.toggle('ready', me.super >= 100);
   }
 
-  function flashCombo(text) {
-    comboEl.textContent = text;
-    comboEl.classList.remove('show');
-    void comboEl.offsetWidth;
-    comboEl.classList.add('show');
-  }
-
-  function checkGameOver() {
-    const remaining = currentPieces.filter(p => p !== null);
-    if (remaining.length === 0) return;
-    const anyFits = remaining.some(p => canPlaceAnywhere(p));
-    if (!anyFits) {
-      finalScoreEl.textContent = score;
-      overlayEl.classList.add('show');
+  function respawn(b) {
+    b.alive = true;
+    b.hp = b.maxHp;
+    b.super = 0;
+    if (b.isPlayer) { b.x = TILE * 3; b.y = TILE * 9; }
+    else {
+      const corners = [[TILE*20, TILE*9], [TILE*11, TILE*3], [TILE*12, TILE*14]];
+      const c = corners[Math.floor(Math.random() * corners.length)];
+      b.x = c[0]; b.y = c[1];
     }
   }
 
-  document.addEventListener('pointermove', (e) => {
-    if (drag) moveDrag(e.clientX, e.clientY);
+  function endGame(won) {
+    game.over = true;
+    document.getElementById('endTitle').textContent = won ? '🏆 SIEG! 🏆' : '💔 Niederlage';
+    document.getElementById('endText').textContent = won
+      ? `Du hast die pinke Arena mit ${game.score} KOs erobert!`
+      : 'Die anderen Barbies waren stärker... Versuch es nochmal!';
+    document.getElementById('endScreen').classList.remove('hidden');
+  }
+
+  // ====== Render ======
+  function isPlayerInBush(b) {
+    return tileAt(b.x, b.y) === 2;
+  }
+
+  function render() {
+    ctx.fillStyle = '#ffb3da';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    ctx.translate(W/2 - game.camera.x, H/2 - game.camera.y);
+
+    // Draw map tiles
+    const cx = game.camera.x, cy = game.camera.y;
+    const vw = W / 2 + TILE, vh = H / 2 + TILE;
+    const x0 = Math.max(0, Math.floor((cx - vw) / TILE));
+    const x1 = Math.min(MAP_W - 1, Math.ceil((cx + vw) / TILE));
+    const y0 = Math.max(0, Math.floor((cy - vh) / TILE));
+    const y1 = Math.min(MAP_H - 1, Math.ceil((cy + vh) / TILE));
+
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) {
+        const t = map[y][x];
+        const px = x * TILE, py = y * TILE;
+        if (t === 0) {
+          ctx.fillStyle = (x + y) % 2 ? '#ffc1e0' : '#ffb3d8';
+          ctx.fillRect(px, py, TILE, TILE);
+          // little hearts
+          if ((x*7+y*13) % 11 === 0) {
+            ctx.fillStyle = 'rgba(214,51,132,0.2)';
+            ctx.beginPath();
+            ctx.arc(px + TILE*0.4, py + TILE*0.5, 4, 0, Math.PI*2);
+            ctx.arc(px + TILE*0.6, py + TILE*0.5, 4, 0, Math.PI*2);
+            ctx.moveTo(px + TILE*0.3, py + TILE*0.55);
+            ctx.lineTo(px + TILE*0.5, py + TILE*0.75);
+            ctx.lineTo(px + TILE*0.7, py + TILE*0.55);
+            ctx.fill();
+          }
+        } else if (t === 1) {
+          // Wall (block)
+          ctx.fillStyle = '#a8246e';
+          ctx.fillRect(px, py, TILE, TILE);
+          ctx.fillStyle = '#c93384';
+          ctx.fillRect(px+3, py+3, TILE-6, TILE-12);
+          ctx.fillStyle = '#7a1955';
+          ctx.fillRect(px+3, py+TILE-9, TILE-6, 6);
+        } else if (t === 2) {
+          ctx.fillStyle = (x+y)%2 ? '#ffc1e0' : '#ffb3d8';
+          ctx.fillRect(px, py, TILE, TILE);
+          // Bush
+          ctx.fillStyle = '#d63384';
+          ctx.beginPath();
+          ctx.arc(px + TILE*0.3, py + TILE*0.5, TILE*0.28, 0, Math.PI*2);
+          ctx.arc(px + TILE*0.6, py + TILE*0.4, TILE*0.3, 0, Math.PI*2);
+          ctx.arc(px + TILE*0.7, py + TILE*0.65, TILE*0.26, 0, Math.PI*2);
+          ctx.arc(px + TILE*0.4, py + TILE*0.7, TILE*0.24, 0, Math.PI*2);
+          ctx.fill();
+          ctx.fillStyle = '#ff8ec7';
+          ctx.beginPath();
+          ctx.arc(px + TILE*0.45, py + TILE*0.45, TILE*0.08, 0, Math.PI*2);
+          ctx.arc(px + TILE*0.65, py + TILE*0.55, TILE*0.07, 0, Math.PI*2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // Particles (under brawlers)
+    for (const p of game.particles) {
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.min(1, p.life / 20);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    // Brawlers
+    const all = [game.me, ...game.enemies];
+    const meInBush = isPlayerInBush(game.me);
+    for (const b of all) {
+      if (!b.alive) continue;
+      const inBush = isPlayerInBush(b);
+      // hide enemies in bush unless I'm next to them
+      if (!b.isPlayer && inBush) {
+        const dToMe = Math.hypot(b.x - game.me.x, b.y - game.me.y);
+        if (dToMe > 90) continue;
+      }
+      if (b.hitFlash > 0) {
+        ctx.save();
+        ctx.filter = 'brightness(2.5)';
+      }
+      drawBaby(ctx, b.x, b.y, b.r, b.def, b.facing, Math.floor(game.time / 200) % 20 === 0);
+      if (b.hitFlash > 0) ctx.restore();
+
+      // HP bar
+      const hpw = b.r * 1.8;
+      ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6, hpw, 6);
+      ctx.fillStyle = b.isPlayer ? '#7fff7f' : '#ff5566';
+      ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6, hpw * (b.hp / b.maxHp), 6);
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
+      ctx.strokeRect(b.x - hpw/2, b.y - b.r * 1.6, hpw, 6);
+
+      // Super bar
+      if (b.super > 0) {
+        ctx.fillStyle = '#ffd900';
+        ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6 - 5, hpw * (b.super / 100), 3);
+      }
+
+      // Name tag
+      if (b.isPlayer) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(b.def.name, b.x, b.y - b.r * 1.8);
+      }
+    }
+
+    // Projectiles
+    for (const p of game.projectiles) {
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      if (p.isSuper) {
+        ctx.fillStyle = 'rgba(255, 217, 0, 0.4)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 1.7, 0, Math.PI*2);
+        ctx.fill();
+      }
+    }
+
+    // Aim indicator for player
+    if (game.me.alive) {
+      const me = game.me;
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      ctx.moveTo(me.x + Math.cos(me.aim) * me.r, me.y + Math.sin(me.aim) * me.r);
+      ctx.lineTo(me.x + Math.cos(me.aim) * 260, me.y + Math.sin(me.aim) * 260);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    ctx.restore();
+  }
+
+  // ====== Game loop ======
+  let last = performance.now();
+  function loop() {
+    const now = performance.now();
+    const dt = Math.min(50, now - last);
+    last = now;
+    if (game && !game.over) update(dt);
+    if (game) render();
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  // ====== UI buttons ======
+  document.getElementById('btnPlay').addEventListener('click', () => {
+    game = createGame();
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('hud').classList.remove('hidden');
+    // Show mobile controls if touch
+    if (matchMedia('(hover: none)').matches) {
+      document.getElementById('joyMove').classList.remove('hidden');
+      document.getElementById('btnShoot').classList.remove('hidden');
+      document.getElementById('btnSuper').classList.remove('hidden');
+    }
   });
-  document.addEventListener('pointerup', (e) => {
-    if (drag) endDrag(e.clientX, e.clientY);
+  document.getElementById('btnRestart').addEventListener('click', () => {
+    game = createGame();
+    document.getElementById('endScreen').classList.add('hidden');
   });
-  document.addEventListener('pointercancel', () => {
-    if (drag) {
-      drag.el.classList.remove('dragging');
-      drag.ghost.remove();
-      clearPreview();
-      drag = null;
-    }
-  });
-
-  document.getElementById('restart').addEventListener('click', init);
-  document.getElementById('playAgain').addEventListener('click', init);
-
-  init();
 })();
 </script>
 </body>
