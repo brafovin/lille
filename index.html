@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Baby Brawl - Pink Arena</title>
+<title>Barbie Brawl - Pink Arena</title>
 <style>
   :root {
     --pink-bg: #ffd1ec;
@@ -179,7 +179,7 @@
 
 <div class="hud hidden" id="hud">
   <div class="stat" id="hpStat">HP 100</div>
-  <div class="stat" id="scoreStat">Babies KO: 0</div>
+  <div class="stat" id="scoreStat">Barbies KO: 0</div>
   <div class="stat" id="superStat">Super 0%</div>
 </div>
 
@@ -188,8 +188,8 @@
 <div class="super-btn hidden" id="btnSuper">⭐</div>
 
 <div class="overlay" id="menu">
-  <h1>🍼 Baby Brawl 🍼</h1>
-  <p>Wähle deinen Baby-Brawler und kämpfe in der pinken Arena! WASD = bewegen, Maus = zielen, Klick = schießen, Leertaste = Super. Mobil: Joysticks unten.</p>
+  <h1>👛 Barbie Brawl 👛</h1>
+  <p>Wähle deine Barbie-Brawlerin und kämpfe in der pinken Arena! WASD = bewegen, Maus = zielen, Klick = schießen, Leertaste = Super. Mobil: Joysticks unten.</p>
   <div class="brawler-grid" id="brawlerGrid"></div>
   <button class="play" id="btnPlay">SPIELEN</button>
 </div>
@@ -214,88 +214,196 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // ====== Brawler definitions: baby figures ======
+  // ====== Brawler definitions: barbie figures ======
   const BRAWLERS = [
-    { id: 'pinky',  name: 'Pinky',  hat: '#ff4fa3', skin: '#ffd8b5', hp: 100, speed: 2.6, fireRate: 280, projSpeed: 9,  dmg: 18, projSize: 7,  spread: 0.05, desc: 'Ausgewogen' },
-    { id: 'tank',   name: 'Bibo',   hat: '#7d2b5e', skin: '#e8b89a', hp: 160, speed: 2.1, fireRate: 420, projSpeed: 7,  dmg: 28, projSize: 11, spread: 0.08, desc: 'Tank' },
-    { id: 'speedy', name: 'Lulu',   hat: '#fff700', skin: '#ffe1c4', hp: 75,  speed: 3.5, fireRate: 180, projSpeed: 11, dmg: 12, projSize: 5,  spread: 0.04, desc: 'Schnell' },
-    { id: 'shot',   name: 'Bubu',   hat: '#ff9d29', skin: '#fbd5b0', hp: 90,  speed: 2.4, fireRate: 600, projSpeed: 8,  dmg: 14, projSize: 6,  spread: 0.35, desc: 'Schrot' },
+    { id: 'pinky',  name: 'Stella',  hair: '#ffd84d', dress: '#ff4fa3', skin: '#ffd8b5', hp: 100, speed: 2.6, fireRate: 280, projSpeed: 9,  dmg: 18, projSize: 7,  spread: 0.05, desc: 'Ausgewogen' },
+    { id: 'tank',   name: 'Roxy',    hair: '#3d1a14', dress: '#7d2b5e', skin: '#e8b89a', hp: 160, speed: 2.1, fireRate: 420, projSpeed: 7,  dmg: 28, projSize: 11, spread: 0.08, desc: 'Tank' },
+    { id: 'speedy', name: 'Skyler',  hair: '#ff8ec7', dress: '#fff700', skin: '#ffe1c4', hp: 75,  speed: 3.5, fireRate: 180, projSpeed: 11, dmg: 12, projSize: 5,  spread: 0.04, desc: 'Schnell' },
+    { id: 'shot',   name: 'Coco',    hair: '#5b2a8a', dress: '#ff9d29', skin: '#fbd5b0', hp: 90,  speed: 2.4, fireRate: 600, projSpeed: 8,  dmg: 14, projSize: 6,  spread: 0.35, desc: 'Schrot' },
   ];
   let selectedBrawlerId = 'pinky';
 
-  // ====== Render a baby figure ======
+  // ====== Render a barbie figure ======
   function drawBaby(ctx, x, y, r, brawler, facing = 0, blink = false) {
     // Shadow
     ctx.fillStyle = 'rgba(0,0,0,0.25)';
     ctx.beginPath();
-    ctx.ellipse(x, y + r * 0.95, r * 0.85, r * 0.3, 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y + r * 1.05, r * 0.7, r * 0.22, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Body (diaper-like)
-    ctx.fillStyle = '#fff';
+    // High heels
+    ctx.fillStyle = '#c01a5a';
     ctx.beginPath();
-    ctx.ellipse(x, y + r * 0.35, r * 0.65, r * 0.55, 0, 0, Math.PI * 2);
+    ctx.ellipse(x - r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = brawler.hat;
-    ctx.fillRect(x - r * 0.55, y + r * 0.25, r * 1.1, r * 0.2);
 
-    // Arms
+    // Legs (slim)
     ctx.fillStyle = brawler.skin;
-    ctx.beginPath();
-    ctx.arc(x - r * 0.55, y + r * 0.2, r * 0.22, 0, Math.PI * 2);
-    ctx.arc(x + r * 0.55, y + r * 0.2, r * 0.22, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(x - r * 0.25, y + r * 0.55, r * 0.14, r * 0.45);
+    ctx.fillRect(x + r * 0.11, y + r * 0.55, r * 0.14, r * 0.45);
 
-    // Head (big - baby)
-    ctx.fillStyle = brawler.skin;
+    // Dress (skirt - triangular flare)
+    ctx.fillStyle = brawler.dress;
     ctx.beginPath();
-    ctx.arc(x, y - r * 0.15, r * 0.7, 0, Math.PI * 2);
-    ctx.fill();
-    // Cheeks
-    ctx.fillStyle = '#ff8eb0';
-    ctx.beginPath();
-    ctx.arc(x - r * 0.42, y, r * 0.13, 0, Math.PI * 2);
-    ctx.arc(x + r * 0.42, y, r * 0.13, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Hat / bonnet
-    ctx.fillStyle = brawler.hat;
-    ctx.beginPath();
-    ctx.arc(x, y - r * 0.35, r * 0.72, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.moveTo(x - r * 0.32, y + r * 0.15);
+    ctx.lineTo(x + r * 0.32, y + r * 0.15);
+    ctx.lineTo(x + r * 0.55, y + r * 0.62);
+    ctx.lineTo(x - r * 0.55, y + r * 0.62);
     ctx.closePath();
     ctx.fill();
-    // Pom
-    ctx.fillStyle = '#fff';
+    // Dress sparkle
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.beginPath();
-    ctx.arc(x, y - r * 1.05, r * 0.18, 0, Math.PI * 2);
+    ctx.arc(x - r * 0.2, y + r * 0.35, r * 0.04, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.15, y + r * 0.45, r * 0.04, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.3, y + r * 0.3, r * 0.03, 0, Math.PI * 2);
+    ctx.fill();
+    // Dress trim
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x - r * 0.55, y + r * 0.58, r * 1.1, r * 0.05);
+
+    // Torso (slim waist)
+    ctx.fillStyle = brawler.dress;
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.32, y - r * 0.05);
+    ctx.lineTo(x + r * 0.32, y - r * 0.05);
+    ctx.lineTo(x + r * 0.3, y + r * 0.18);
+    ctx.lineTo(x - r * 0.3, y + r * 0.18);
+    ctx.closePath();
     ctx.fill();
 
+    // Arms (slim)
+    ctx.fillStyle = brawler.skin;
+    ctx.fillRect(x - r * 0.45, y - r * 0.05, r * 0.13, r * 0.4);
+    ctx.fillRect(x + r * 0.32, y - r * 0.05, r * 0.13, r * 0.4);
+    // Hands
+    ctx.beginPath();
+    ctx.arc(x - r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
+    ctx.arc(x + r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Long hair behind head
+    ctx.fillStyle = brawler.hair;
+    ctx.beginPath();
+    ctx.ellipse(x, y + r * 0.05, r * 0.6, r * 0.65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Hair extends down
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.55, y - r * 0.1);
+    ctx.lineTo(x - r * 0.45, y + r * 0.5);
+    ctx.lineTo(x - r * 0.2, y + r * 0.4);
+    ctx.lineTo(x - r * 0.25, y - r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x + r * 0.55, y - r * 0.1);
+    ctx.lineTo(x + r * 0.45, y + r * 0.5);
+    ctx.lineTo(x + r * 0.2, y + r * 0.4);
+    ctx.lineTo(x + r * 0.25, y - r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+
+    // Head
+    ctx.fillStyle = brawler.skin;
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.25, r * 0.42, r * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hair top (fringe / bangs)
+    ctx.fillStyle = brawler.hair;
+    ctx.beginPath();
+    ctx.arc(x, y - r * 0.45, r * 0.45, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // Fringe sweep
+    ctx.beginPath();
+    ctx.moveTo(x - r * 0.42, y - r * 0.4);
+    ctx.quadraticCurveTo(x - r * 0.1, y - r * 0.15, x + r * 0.42, y - r * 0.35);
+    ctx.quadraticCurveTo(x + r * 0.2, y - r * 0.5, x - r * 0.42, y - r * 0.4);
+    ctx.fill();
+    // Hair shine
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.15, y - r * 0.55, r * 0.1, r * 0.04, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyeshadow
+    ctx.fillStyle = brawler.dress;
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
     // Eyes
-    const eyeOffset = Math.cos(facing) * r * 0.1;
-    const eyeY = y - r * 0.15 + Math.sin(facing) * r * 0.08;
-    ctx.fillStyle = '#222';
+    const eyeOffset = Math.cos(facing) * r * 0.05;
+    const eyeY = y - r * 0.22 + Math.sin(facing) * r * 0.05;
     if (blink) {
-      ctx.fillRect(x - r * 0.28 - 4 + eyeOffset, eyeY, 8, 2);
-      ctx.fillRect(x + r * 0.28 - 4 + eyeOffset, eyeY, 8, 2);
-    } else {
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(x - r * 0.25 + eyeOffset, eyeY, r * 0.1, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.25 + eyeOffset, eyeY, r * 0.1, 0, Math.PI * 2);
+      ctx.moveTo(x - r * 0.25 + eyeOffset, eyeY);
+      ctx.lineTo(x - r * 0.1 + eyeOffset, eyeY);
+      ctx.moveTo(x + r * 0.1 + eyeOffset, eyeY);
+      ctx.lineTo(x + r * 0.25 + eyeOffset, eyeY);
+      ctx.stroke();
+    } else {
+      // White of eye
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(x - r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
+      ctx.ellipse(x + r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
+      ctx.fill();
+      // Iris (matches dress for fun)
+      ctx.fillStyle = '#3a6ec9';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      // Pupil
+      ctx.fillStyle = '#222';
+      ctx.beginPath();
+      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
       ctx.fill();
       // Shine
       ctx.fillStyle = '#fff';
       ctx.beginPath();
-      ctx.arc(x - r * 0.22 + eyeOffset, eyeY - r * 0.03, r * 0.03, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.28 + eyeOffset, eyeY - r * 0.03, r * 0.03, 0, Math.PI * 2);
+      ctx.arc(x - r * 0.15 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
+      ctx.arc(x + r * 0.19 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
       ctx.fill();
+      // Lashes
+      ctx.strokeStyle = '#222';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(x - r * 0.24 + eyeOffset, eyeY - r * 0.08);
+      ctx.lineTo(x - r * 0.27 + eyeOffset, eyeY - r * 0.13);
+      ctx.moveTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.1);
+      ctx.lineTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.16);
+      ctx.moveTo(x + r * 0.24 + eyeOffset, eyeY - r * 0.08);
+      ctx.lineTo(x + r * 0.27 + eyeOffset, eyeY - r * 0.13);
+      ctx.moveTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.1);
+      ctx.lineTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.16);
+      ctx.stroke();
     }
 
-    // Mouth (little smile)
-    ctx.strokeStyle = '#a14760';
-    ctx.lineWidth = 2;
+    // Blush
+    ctx.fillStyle = 'rgba(255, 100, 150, 0.4)';
     ctx.beginPath();
-    ctx.arc(x, y + r * 0.05, r * 0.12, 0, Math.PI);
-    ctx.stroke();
+    ctx.ellipse(x - r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Lipstick smile
+    ctx.fillStyle = '#d63384';
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.02, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff8ec7';
+    ctx.beginPath();
+    ctx.ellipse(x, y - r * 0.02, r * 0.06, r * 0.02, 0, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   // ====== Build brawler selection cards ======
@@ -507,7 +615,7 @@
         dmg: def.dmg,
         owner: b,
         life: 60,
-        color: def.hat,
+        color: def.dress,
       });
     }
   }
@@ -739,7 +847,7 @@
     document.getElementById('endTitle').textContent = won ? '🏆 SIEG! 🏆' : '💔 Niederlage';
     document.getElementById('endText').textContent = won
       ? `Du hast die pinke Arena mit ${game.score} KOs erobert!`
-      : 'Die anderen Babies waren stärker... Versuch es nochmal!';
+      : 'Die anderen Barbies waren stärker... Versuch es nochmal!';
     document.getElementById('endScreen').classList.remove('hidden');
   }
 
