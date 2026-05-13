@@ -319,17 +319,17 @@
     };
   }
 
-  // ====== Projection ======
+  // ====== Projection (top-down: path runs vertically) ======
+  // Z = depth from player. z=0 → player position (bottom), z=FAR_Z → top of screen.
   function project(worldX, worldY, z) {
-    const horizonY = H * HORIZON;
-    const k = 0.04;
-    const scale = 1 / (1 + Math.max(0, z) * k);
-    // z=0 (near) -> screenY = H (bottom)
-    // z=FAR_Z (far) -> screenY -> horizonY
-    const screenY = horizonY + (H - horizonY) * scale;
+    const playerScreenY = H * 0.82;
+    const topScreenY = -60;
+    const t = Math.max(0, z / FAR_Z); // 0 near, 1 far
+    const screenY = playerScreenY - t * (playerScreenY - topScreenY);
+    const scale = Math.max(0.55, 1 - t * 0.4); // mild fade in size with depth
     const cx = W / 2;
-    const screenX = cx + worldX * (W * 0.18) * scale;
-    return { x: screenX, y: screenY - worldY * scale * (H * 0.22), scale };
+    const screenX = cx + worldX * (W * 0.18);
+    return { x: screenX, y: screenY - worldY * H * 0.16, scale };
   }
 
   // ====== Obstacle types (zoo themed) ======
@@ -542,58 +542,42 @@
 
   // ====== Render ======
   function drawSky() {
-    // Sky gradient
-    const sg = ctx.createLinearGradient(0, 0, 0, H * HORIZON);
-    sg.addColorStop(0, '#7dd3fc');
-    sg.addColorStop(1, '#fde68a');
-    ctx.fillStyle = sg;
-    ctx.fillRect(0, 0, W, H * HORIZON);
-    // Sun
-    ctx.fillStyle = '#fef3c7';
-    ctx.beginPath();
-    ctx.arc(W * 0.78, H * 0.18, H * 0.07, 0, Math.PI * 2);
-    ctx.fill();
-    // Distant zoo silhouette
-    ctx.fillStyle = '#65a30d';
-    const horizonY = H * HORIZON;
-    ctx.beginPath();
-    ctx.moveTo(0, horizonY);
-    let x = 0;
-    while (x < W) {
-      const h = 20 + Math.sin(x * 0.013 + 3) * 12 + Math.sin(x * 0.007) * 18;
-      ctx.lineTo(x, horizonY - h);
-      x += 30;
+    // Background grass everywhere (top-down view)
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#15803d');
+    bg.addColorStop(1, '#4ade80');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Random grass tufts (deterministic by tile, scrolling)
+    const tileH = 80;
+    const scroll = (game.distance * 14) % tileH;
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    for (let row = -1; row * tileH < H + tileH; row++) {
+      const yBase = row * tileH + scroll;
+      for (let col = 0; col < 16; col++) {
+        const seed = (row * 31 + col * 17) % 100;
+        const gx = (col / 16) * W + ((seed * 53) % 50);
+        const gy = yBase + (seed % 30);
+        ctx.beginPath();
+        ctx.arc(gx, gy, 2 + (seed % 3), 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
-    ctx.lineTo(W, horizonY);
-    ctx.closePath();
-    ctx.fill();
-    // Zoo entrance arch (far)
-    ctx.fillStyle = '#a16207';
-    const ax = W * 0.5, ay = horizonY - 50;
-    ctx.fillRect(ax - 60, ay, 12, 50);
-    ctx.fillRect(ax + 48, ay, 12, 50);
-    ctx.fillRect(ax - 60, ay - 8, 120, 12);
-    ctx.fillStyle = '#dc2626';
-    ctx.font = `bold ${Math.floor(H * 0.015)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('ZOO', ax, ay - 12);
   }
 
   function drawGround() {
-    const horizonY = H * HORIZON;
-    // Ground gradient
-    const gg = ctx.createLinearGradient(0, horizonY, 0, H);
-    gg.addColorStop(0, '#86efac');
-    gg.addColorStop(1, '#16a34a');
-    ctx.fillStyle = gg;
-    ctx.fillRect(0, horizonY, W, H - horizonY);
-
-    // Path - draw as projected quad
+    // Path: vertical strip with mild width fade at top (depth hint)
     const farL = project(-LANE_W * 1.7, 0, FAR_Z);
     const farR = project(LANE_W * 1.7, 0, FAR_Z);
     const nearL = project(-LANE_W * 1.7, 0, 0);
     const nearR = project(LANE_W * 1.7, 0, 0);
-    ctx.fillStyle = '#d6c898';
+
+    // Sandy path
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#a39368');
+    grad.addColorStop(1, '#e0d29f');
+    ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(farL.x, farL.y);
     ctx.lineTo(farR.x, farR.y);
@@ -604,16 +588,18 @@
 
     // Path borders
     ctx.strokeStyle = '#854d0e';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 5;
     ctx.beginPath();
     ctx.moveTo(farL.x, farL.y); ctx.lineTo(nearL.x, nearL.y);
     ctx.moveTo(farR.x, farR.y); ctx.lineTo(nearR.x, nearR.y);
     ctx.stroke();
 
-    // Lane stripes (zoo style: paw prints/dashed)
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([8, 14]);
+    // Lane dividers (vertical lines)
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([18, 22]);
+    const offset = (game.distance * 22) % 40;
+    ctx.lineDashOffset = -offset;
     for (let i = -1; i <= 1; i += 2) {
       const fL = project(i * LANE_W * 0.5, 0, FAR_Z);
       const nL = project(i * LANE_W * 0.5, 0, 0);
@@ -623,20 +609,22 @@
       ctx.stroke();
     }
     ctx.setLineDash([]);
+    ctx.lineDashOffset = 0;
 
-    // Moving stripes for speed feel
-    const dashLen = 1.0;
-    const offset = (game.distance * 0.5) % dashLen;
-    for (let z = -offset; z < FAR_Z; z += dashLen * 2) {
-      if (z < 0) continue;
-      const p1 = project(0, 0, z);
-      const p2 = project(0, 0, z + dashLen);
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-      ctx.lineWidth = Math.max(1, 4 * p1.scale);
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.stroke();
+    // Paw print decals scrolling down to sell motion
+    ctx.fillStyle = 'rgba(120, 70, 30, 0.25)';
+    const pawSpacing = H * 0.18;
+    const pawScroll = (game.distance * 22) % pawSpacing;
+    for (let py = pawScroll - pawSpacing; py < H + pawSpacing; py += pawSpacing) {
+      for (const lane of LANES) {
+        const x = W / 2 + lane * LANE_W * (W * 0.18);
+        ctx.beginPath();
+        ctx.arc(x - 8, py, 4, 0, Math.PI * 2);
+        ctx.arc(x + 8, py, 4, 0, Math.PI * 2);
+        ctx.arc(x - 5, py - 10, 3, 0, Math.PI * 2);
+        ctx.arc(x + 5, py - 10, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   }
 
@@ -706,103 +694,108 @@
     const s = p.scale;
     if (s <= 0.01) return;
     const t = o.type;
+    // Soft shadow under each obstacle (top-down sense of mass)
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.beginPath();
+    ctx.ellipse(p.x + 4*s, p.y + 6*s, 50*s, 14*s, 0, 0, Math.PI*2);
+    ctx.fill();
+
     if (t.id === 'cage') {
-      // Animal cage (block)
-      const w = 80 * s, h = 110 * s;
+      const w = 90 * s, h = 90 * s;
       ctx.fillStyle = '#9ca3af';
-      ctx.fillRect(p.x - w/2, p.y - h, w, h);
-      // Bars
+      ctx.fillRect(p.x - w/2, p.y - h/2, w, h);
       ctx.strokeStyle = '#374151';
       ctx.lineWidth = Math.max(1, 3 * s);
       for (let i = 0; i < 5; i++) {
         const bx = p.x - w/2 + (i+0.5) * w/5;
         ctx.beginPath();
-        ctx.moveTo(bx, p.y - h + 12 * s); ctx.lineTo(bx, p.y);
+        ctx.moveTo(bx, p.y - h/2 + 6*s); ctx.lineTo(bx, p.y + h/2 - 6*s);
         ctx.stroke();
       }
-      // Roof
+      ctx.strokeRect(p.x - w/2, p.y - h/2, w, h);
+      // Red roof corners (top-down)
       ctx.fillStyle = '#dc2626';
-      ctx.beginPath();
-      ctx.moveTo(p.x - w/2 - 6*s, p.y - h);
-      ctx.lineTo(p.x, p.y - h - 22*s);
-      ctx.lineTo(p.x + w/2 + 6*s, p.y - h);
-      ctx.closePath();
-      ctx.fill();
-      // Caged animal eyes
+      ctx.fillRect(p.x - w/2 - 4*s, p.y - h/2 - 4*s, w + 8*s, 8*s);
+      // Caged animal peeking
       ctx.fillStyle = '#fef3c7';
       ctx.beginPath();
-      ctx.arc(p.x - 8*s, p.y - h/2, 4*s, 0, Math.PI*2);
-      ctx.arc(p.x + 8*s, p.y - h/2, 4*s, 0, Math.PI*2);
+      ctx.arc(p.x - 8*s, p.y, 4*s, 0, Math.PI*2);
+      ctx.arc(p.x + 8*s, p.y, 4*s, 0, Math.PI*2);
       ctx.fill();
       ctx.fillStyle = '#000';
       ctx.beginPath();
-      ctx.arc(p.x - 8*s, p.y - h/2, 2*s, 0, Math.PI*2);
-      ctx.arc(p.x + 8*s, p.y - h/2, 2*s, 0, Math.PI*2);
+      ctx.arc(p.x - 8*s, p.y, 2*s, 0, Math.PI*2);
+      ctx.arc(p.x + 8*s, p.y, 2*s, 0, Math.PI*2);
       ctx.fill();
     } else if (t.id === 'trough') {
-      // Water trough (low, jump over)
-      const w = 90 * s, h = 30 * s;
+      const w = 100 * s, h = 36 * s;
       ctx.fillStyle = '#78350f';
-      ctx.fillRect(p.x - w/2, p.y - h, w, h);
+      ctx.fillRect(p.x - w/2, p.y - h/2, w, h);
       ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(p.x - w/2 + 4*s, p.y - h + 4*s, w - 8*s, h * 0.5);
-      // Wavy water
+      ctx.fillRect(p.x - w/2 + 4*s, p.y - h/2 + 4*s, w - 8*s, h - 8*s);
       ctx.strokeStyle = '#bfdbfe';
       ctx.lineWidth = Math.max(1, 2*s);
       ctx.beginPath();
-      for (let i = 0; i < w; i += 8*s) {
-        const wy = p.y - h + 6*s + Math.sin((i + game.tick*4) * 0.1) * 2*s;
-        if (i === 0) ctx.moveTo(p.x - w/2 + 4*s, wy);
-        else ctx.lineTo(p.x - w/2 + 4*s + i, wy);
+      for (let i = 0; i < w - 8*s; i += 8*s) {
+        const wy = p.y + Math.sin((i + game.tick*4) * 0.1) * 2*s;
+        const wx = p.x - w/2 + 4*s + i;
+        if (i === 0) ctx.moveTo(wx, wy);
+        else ctx.lineTo(wx, wy);
       }
       ctx.stroke();
     } else if (t.id === 'gate') {
-      // Overhead bar - slide under
-      const w = 110 * s, h = 16 * s;
-      const barY = p.y - 70 * s;
-      // Posts
+      // Bar across the lane (slide under it)
+      const w = 120 * s, h = 22 * s;
+      // Posts on either side
       ctx.fillStyle = '#78350f';
-      ctx.fillRect(p.x - w/2 - 4*s, p.y - 90*s, 8*s, 90*s);
-      ctx.fillRect(p.x + w/2 - 4*s, p.y - 90*s, 8*s, 90*s);
-      // Bar
+      ctx.fillRect(p.x - w/2 - 8*s, p.y - h/2 - 6*s, 10*s, h + 12*s);
+      ctx.fillRect(p.x + w/2 - 2*s, p.y - h/2 - 6*s, 10*s, h + 12*s);
+      // Bar with stripes
       ctx.fillStyle = '#a16207';
-      ctx.fillRect(p.x - w/2, barY, w, h);
-      // Sign on bar
+      ctx.fillRect(p.x - w/2, p.y - h/2, w, h);
       ctx.fillStyle = '#fbbf24';
-      ctx.fillRect(p.x - 20*s, barY - 20*s, 40*s, 20*s);
-      ctx.fillStyle = '#7c2d12';
-      ctx.font = `bold ${Math.max(8, 14*s)}px sans-serif`;
+      for (let i = 0; i < 6; i++) {
+        ctx.fillRect(p.x - w/2 + (i * w/6) + 4*s, p.y - h/2, w/18, h);
+      }
+      ctx.font = `bold ${Math.max(10, 18*s)}px sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('🐘', p.x, barY - 10*s);
+      ctx.fillText('🐘', p.x, p.y);
     } else if (t.id === 'haystack') {
-      const w = 80 * s, h = 50 * s;
+      const r = 42 * s;
       ctx.fillStyle = '#facc15';
       ctx.beginPath();
-      ctx.ellipse(p.x, p.y - h/2, w/2, h/2, 0, 0, Math.PI*2);
+      ctx.arc(p.x, p.y, r, 0, Math.PI*2);
       ctx.fill();
       ctx.strokeStyle = '#a16207';
       ctx.lineWidth = Math.max(1, 1.5*s);
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(p.x - w/2 + i * w/5, p.y - h + 4*s);
-        ctx.lineTo(p.x - w/2 + i * w/5 + 6*s, p.y - 2*s);
+        ctx.moveTo(p.x + Math.cos(a) * r * 0.4, p.y + Math.sin(a) * r * 0.4);
+        ctx.lineTo(p.x + Math.cos(a) * r * 0.95, p.y + Math.sin(a) * r * 0.95);
         ctx.stroke();
       }
     } else if (t.id === 'statue') {
-      // Animal statue (elephant-ish)
-      const w = 60 * s, h = 110 * s;
-      ctx.fillStyle = '#a8a29e';
-      ctx.fillRect(p.x - w/2, p.y - h * 0.3, w, h * 0.3);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y - h * 0.5, w * 0.6, 0, Math.PI*2);
-      ctx.fill();
-      // Trunk
-      ctx.fillStyle = '#78716c';
-      ctx.fillRect(p.x - 4*s, p.y - h * 0.5, 8*s, h * 0.3);
-      // Base
+      // Elephant-ish statue, top-down view
+      const r = 36 * s;
       ctx.fillStyle = '#d6d3d1';
-      ctx.fillRect(p.x - w/2 - 6*s, p.y - 8*s, w + 12*s, 8*s);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r + 6*s, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#a8a29e';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y, r, r * 0.85, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Trunk (line out the front, toward player = down)
+      ctx.fillStyle = '#78716c';
+      ctx.fillRect(p.x - 5*s, p.y + r * 0.6, 10*s, r * 0.7);
+      // Ears
+      ctx.fillStyle = '#a8a29e';
+      ctx.beginPath();
+      ctx.arc(p.x - r * 0.8, p.y - r * 0.3, r * 0.4, 0, Math.PI*2);
+      ctx.arc(p.x + r * 0.8, p.y - r * 0.3, r * 0.4, 0, Math.PI*2);
+      ctx.fill();
     }
   }
 
@@ -833,14 +826,123 @@
     ctx.restore();
   }
 
+  // Top-down dino (head up the screen, into the world)
+  function drawDinoTopDown(ctx, x, y, scale, dino, pose, tick, jumpAmt) {
+    const s = scale;
+    ctx.save();
+    ctx.translate(x, y);
+
+    // Detached shadow when jumping
+    const shadowDrop = jumpAmt * 28;
+    ctx.fillStyle = `rgba(0,0,0,${0.35 - jumpAmt * 0.15})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 28 * s + shadowDrop, 28 * s, 9 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Tail behind (toward bottom of screen)
+    const tailSway = Math.sin(tick * 0.35) * 5 * s;
+    ctx.fillStyle = dino.body;
+    ctx.beginPath();
+    ctx.moveTo(-9 * s, 14 * s);
+    ctx.quadraticCurveTo(tailSway, 38 * s, 9 * s, 14 * s);
+    ctx.closePath();
+    ctx.fill();
+
+    // Legs (4 paws splayed, running animation)
+    const legPhase = tick * 0.6;
+    ctx.fillStyle = dino.body;
+    if (pose !== 'slide') {
+      const f = Math.sin(legPhase) * 4 * s;
+      const b = Math.sin(legPhase + Math.PI) * 5 * s;
+      ctx.beginPath();
+      ctx.ellipse(-19 * s, -8 * s + f, 7 * s, 10 * s, 0.3, 0, Math.PI * 2);
+      ctx.ellipse(19 * s, -8 * s - f, 7 * s, 10 * s, -0.3, 0, Math.PI * 2);
+      ctx.ellipse(-20 * s, 14 * s + b, 7 * s, 11 * s, 0.3, 0, Math.PI * 2);
+      ctx.ellipse(20 * s, 14 * s - b, 7 * s, 11 * s, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Body (oval seen from above)
+    ctx.fillStyle = dino.body;
+    ctx.beginPath();
+    ctx.ellipse(0, 2 * s, 22 * s, 28 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Belly stripe
+    ctx.fillStyle = dino.belly;
+    ctx.beginPath();
+    ctx.ellipse(0, 4 * s, 13 * s, 22 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Spikes along the back (centerline)
+    ctx.fillStyle = dino.spike;
+    for (let i = -2; i <= 1; i++) {
+      const sy = i * 7 * s;
+      ctx.beginPath();
+      ctx.moveTo(-4 * s, sy);
+      ctx.lineTo(0, sy - 6 * s);
+      ctx.lineTo(4 * s, sy);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Head (above body, where dino is heading)
+    ctx.fillStyle = dino.body;
+    ctx.beginPath();
+    ctx.ellipse(0, -24 * s, 16 * s, 15 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Snout
+    ctx.beginPath();
+    ctx.ellipse(0, -34 * s, 11 * s, 9 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes (on the head, looking up)
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(-6 * s, -26 * s, 4 * s, 0, Math.PI * 2);
+    ctx.arc(6 * s, -26 * s, 4 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(-6 * s, -27 * s, 2 * s, 0, Math.PI * 2);
+    ctx.arc(6 * s, -27 * s, 2 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(-5 * s, -28 * s, 0.9 * s, 0, Math.PI * 2);
+    ctx.arc(7 * s, -28 * s, 0.9 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Nostrils
+    ctx.fillStyle = dino.spike;
+    ctx.beginPath();
+    ctx.arc(-2.5 * s, -37 * s, 1.1 * s, 0, Math.PI * 2);
+    ctx.arc(2.5 * s, -37 * s, 1.1 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Tiny teeth
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.moveTo(-5 * s, -32 * s);
+    ctx.lineTo(-3 * s, -29 * s);
+    ctx.lineTo(0, -32 * s);
+    ctx.lineTo(3 * s, -29 * s);
+    ctx.lineTo(5 * s, -32 * s);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
   function drawPlayer() {
     const px = game.laneAnim;
     const p = project(px, 0, 0.5);
     const pose = game.jumping || game.y > 0 ? 'jump' : (game.sliding > 0 ? 'slide' : 'run');
-    const playerScale = Math.max(0.9, Math.min(2.0, H / 600));
-    const footOffset = 36 * playerScale; // legs extend ~36*scale below origin
-    const jumpOffset = game.y * (H * 0.25);
-    drawDino(ctx, p.x, p.y - footOffset - jumpOffset, playerScale, game.dino, pose, game.tick * 2);
+    const baseScale = Math.max(0.9, Math.min(1.6, H / 700));
+    let scale = baseScale;
+    if (pose === 'jump') scale = baseScale * (1 + Math.min(1, game.y) * 0.45);
+    else if (pose === 'slide') scale = baseScale * 0.82;
+    drawDinoTopDown(ctx, p.x, p.y, scale, game.dino, pose, game.tick * 2, Math.max(0, game.y));
   }
 
   function render() {
