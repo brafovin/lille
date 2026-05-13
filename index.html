@@ -3,173 +3,94 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Barbie Brawl - Pink Arena</title>
+<title>Dino Surfers - Zoo Run</title>
 <style>
-  :root {
-    --pink-bg: #ffd1ec;
-    --pink-mid: #ff8ec7;
-    --pink-deep: #d63384;
-    --pink-dark: #6a1b4d;
-    --text: #fff;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
   html, body {
-    margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 30%, #ffb3da, #d63384 80%);
+    background: #4ec0e8;
     font-family: -apple-system, "Segoe UI", sans-serif;
-    color: var(--text);
+    color: #fff;
     touch-action: none;
   }
-  #game {
-    display: block;
-    width: 100vw;
-    height: 100vh;
-    background: var(--pink-bg);
-  }
+  #game { display: block; width: 100vw; height: 100vh; }
   .overlay {
     position: fixed; inset: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    background: rgba(106, 27, 77, 0.9);
-    z-index: 10;
-    padding: 20px;
-    text-align: center;
+    background: rgba(20, 40, 30, 0.92);
+    z-index: 10; padding: 20px; text-align: center;
   }
   .overlay h1 {
-    font-size: clamp(2rem, 7vw, 4rem);
-    margin: 0 0 10px;
-    color: #fff;
-    text-shadow: 3px 3px 0 var(--pink-deep), 6px 6px 0 rgba(0,0,0,0.2);
+    font-size: clamp(2rem, 8vw, 4.2rem);
+    margin: 0 0 6px;
+    color: #ffe44f;
+    text-shadow: 3px 3px 0 #c2410c, 6px 6px 0 rgba(0,0,0,0.3);
     letter-spacing: 2px;
   }
-  .overlay p {
-    font-size: 1rem;
-    margin: 6px 0 20px;
-    max-width: 420px;
-    line-height: 1.4;
+  .overlay h2 {
+    font-size: 1.1rem; color: #a7f3d0; margin-bottom: 14px;
   }
-  .brawler-grid {
+  .overlay p {
+    font-size: 0.95rem; max-width: 460px; line-height: 1.45; margin: 6px 0 18px;
+    color: #d1f5e6;
+  }
+  .dino-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 12px;
-    max-width: 500px;
-    width: 100%;
-    margin: 12px 0 18px;
+    gap: 12px; max-width: 500px; width: 100%; margin: 10px 0 18px;
   }
-  .brawler-card {
-    background: linear-gradient(160deg, #ff8ec7, #d63384);
+  .dino-card {
+    background: linear-gradient(160deg, #15803d, #064e3b);
     border: 3px solid #fff;
     border-radius: 16px;
     padding: 10px 8px;
     cursor: pointer;
     transition: transform 0.15s;
-    display: flex; flex-direction: column;
-    align-items: center;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+    display: flex; flex-direction: column; align-items: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
   }
-  .brawler-card:hover, .brawler-card.selected {
+  .dino-card:hover, .dino-card.selected {
     transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 0 rgba(0,0,0,0.25);
-    border-color: #fff700;
+    border-color: #fde047;
   }
-  .brawler-card canvas {
-    width: 64px; height: 64px;
-    image-rendering: pixelated;
-  }
-  .brawler-card .name {
-    font-weight: bold; font-size: 0.95rem; margin-top: 4px;
-  }
-  .brawler-card .desc {
-    font-size: 0.7rem; opacity: 0.9; margin-top: 2px;
-  }
+  .dino-card canvas { width: 84px; height: 84px; }
+  .dino-card .name { font-weight: bold; font-size: 0.95rem; margin-top: 4px; }
+  .dino-card .desc { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
   button.play {
-    background: linear-gradient(180deg, #ffe44f, #ff9d29);
-    color: var(--pink-dark);
-    font-weight: 900;
-    font-size: 1.3rem;
+    background: linear-gradient(180deg, #fde047, #f59e0b);
+    color: #14532d;
+    font-weight: 900; font-size: 1.3rem;
     border: 3px solid #fff;
-    padding: 14px 40px;
-    border-radius: 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+    padding: 14px 40px; border-radius: 14px;
+    cursor: pointer; letter-spacing: 1px;
+    box-shadow: 0 6px 0 rgba(0,0,0,0.3);
   }
-  button.play:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.25); }
+  button.play:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,0.3); }
   .hud {
-    position: fixed;
-    top: 10px; left: 10px; right: 10px;
+    position: fixed; top: 10px; left: 10px; right: 10px;
     display: flex; justify-content: space-between;
-    pointer-events: none;
-    z-index: 5;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    pointer-events: none; z-index: 5;
+    font-weight: bold; text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
   }
   .hud .stat {
-    background: rgba(106,27,77,0.7);
-    padding: 6px 12px;
+    background: rgba(20, 40, 30, 0.6);
+    padding: 6px 14px;
     border-radius: 10px;
-    border: 2px solid #fff;
-    font-size: 0.9rem;
-  }
-  .joystick, .shoot-btn {
-    position: fixed;
-    bottom: 30px;
-    width: 130px; height: 130px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    border: 3px solid rgba(255,255,255,0.5);
-    z-index: 6;
-    touch-action: none;
-  }
-  .joystick { left: 20px; }
-  .shoot-btn {
-    right: 20px;
-    background: rgba(255, 80, 150, 0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.5rem;
-  }
-  .joystick .knob {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 55px; height: 55px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.7);
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-  }
-  .super-btn {
-    position: fixed;
-    bottom: 175px; right: 30px;
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: rgba(255, 217, 0, 0.3);
-    border: 3px solid #ffd900;
-    z-index: 6;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2rem;
-    color: #fff;
-    opacity: 0.5;
-  }
-  .super-btn.ready { opacity: 1; animation: pulse 1s infinite; }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    border: 2px solid #fde047;
+    font-size: 1rem;
   }
   .hidden { display: none !important; }
-  .badge {
-    display: inline-block;
-    background: #ffd900;
-    color: var(--pink-dark);
-    padding: 2px 8px;
-    border-radius: 8px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    margin-left: 4px;
+  .controls-hint {
+    position: fixed; bottom: 10px; left: 0; right: 0;
+    text-align: center; font-size: 0.8rem;
+    opacity: 0.6; pointer-events: none; z-index: 5;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
   }
-  @media (hover: hover) {
-    .joystick, .shoot-btn, .super-btn { display: none; }
+  .touch-zone {
+    position: fixed; inset: 0; z-index: 4;
+    touch-action: none;
   }
 </style>
 </head>
@@ -178,25 +99,28 @@
 <canvas id="game"></canvas>
 
 <div class="hud hidden" id="hud">
-  <div class="stat" id="hpStat">HP 100</div>
-  <div class="stat" id="scoreStat">Barbies KO: 0</div>
-  <div class="stat" id="superStat">Super 0%</div>
+  <div class="stat" id="scoreStat">🏃 0m</div>
+  <div class="stat" id="boneStat">🦴 0</div>
+  <div class="stat" id="bestStat">⭐ 0m</div>
 </div>
 
-<div class="joystick hidden" id="joyMove"><div class="knob"></div></div>
-<div class="shoot-btn hidden" id="btnShoot">🍼</div>
-<div class="super-btn hidden" id="btnSuper">⭐</div>
+<div class="touch-zone hidden" id="touchZone"></div>
+
+<div class="controls-hint hidden" id="hint">
+  A/D oder ← → Spur · W/↑/Leertaste = springen · S/↓ = rutschen · (Mobil: wischen)
+</div>
 
 <div class="overlay" id="menu">
-  <h1>👛 Barbie Brawl 👛</h1>
-  <p>Wähle deine Barbie-Brawlerin und kämpfe in der pinken Arena! WASD = bewegen, Maus = zielen, Klick = schießen, Leertaste = Super. Mobil: Joysticks unten.</p>
-  <div class="brawler-grid" id="brawlerGrid"></div>
-  <button class="play" id="btnPlay">SPIELEN</button>
+  <h1>🦖 Dino Surfers 🦕</h1>
+  <h2>ZOO RUN</h2>
+  <p>Renne durch den Zoo, weiche Käfigen aus, springe über Wassertröge, rutsche unter Stangen und sammle Knochen! Wische oder nutze WASD/Pfeiltasten.</p>
+  <div class="dino-grid" id="dinoGrid"></div>
+  <button class="play" id="btnPlay">LOS GEHT'S</button>
 </div>
 
 <div class="overlay hidden" id="endScreen">
-  <h1 id="endTitle">Sieg!</h1>
-  <p id="endText">Du hast die pinke Arena erobert!</p>
+  <h1 id="endTitle">Game Over</h1>
+  <p id="endText"></p>
   <button class="play" id="btnRestart">NOCHMAL</button>
 </div>
 
@@ -206,829 +130,767 @@
   const ctx = canvas.getContext('2d');
   let W = 0, H = 0;
   function resize() {
-    W = canvas.width = window.innerWidth * devicePixelRatio;
-    H = canvas.height = window.innerHeight * devicePixelRatio;
-    canvas.style.width = window.innerWidth + 'px';
-    canvas.style.height = window.innerHeight + 'px';
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = canvas.width = innerWidth * dpr;
+    H = canvas.height = innerHeight * dpr;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
   }
-  window.addEventListener('resize', resize);
+  addEventListener('resize', resize);
   resize();
 
-  // ====== Brawler definitions: barbie figures ======
-  const BRAWLERS = [
-    { id: 'pinky',  name: 'Stella',  hair: '#ffd84d', dress: '#ff4fa3', skin: '#ffd8b5', hp: 100, speed: 2.6, fireRate: 280, projSpeed: 9,  dmg: 18, projSize: 7,  spread: 0.05, desc: 'Ausgewogen' },
-    { id: 'tank',   name: 'Roxy',    hair: '#3d1a14', dress: '#7d2b5e', skin: '#e8b89a', hp: 160, speed: 2.1, fireRate: 420, projSpeed: 7,  dmg: 28, projSize: 11, spread: 0.08, desc: 'Tank' },
-    { id: 'speedy', name: 'Skyler',  hair: '#ff8ec7', dress: '#fff700', skin: '#ffe1c4', hp: 75,  speed: 3.5, fireRate: 180, projSpeed: 11, dmg: 12, projSize: 5,  spread: 0.04, desc: 'Schnell' },
-    { id: 'shot',   name: 'Coco',    hair: '#5b2a8a', dress: '#ff9d29', skin: '#fbd5b0', hp: 90,  speed: 2.4, fireRate: 600, projSpeed: 8,  dmg: 14, projSize: 6,  spread: 0.35, desc: 'Schrot' },
+  // ====== Dino definitions ======
+  const DINOS = [
+    { id: 'rex',    name: 'Rex',     body: '#22c55e', belly: '#bbf7d0', spike: '#15803d', desc: 'T-Rex' },
+    { id: 'tri',    name: 'Trixi',   body: '#a855f7', belly: '#e9d5ff', spike: '#6b21a8', desc: 'Tri' },
+    { id: 'ptero',  name: 'Pteri',   body: '#3b82f6', belly: '#bfdbfe', spike: '#1e3a8a', desc: 'Flug' },
+    { id: 'bronto', name: 'Bronto',  body: '#f97316', belly: '#fed7aa', spike: '#7c2d12', desc: 'Lang' },
   ];
-  let selectedBrawlerId = 'pinky';
+  let selectedDinoId = 'rex';
 
-  // ====== Render a barbie figure ======
-  function drawBaby(ctx, x, y, r, brawler, facing = 0, blink = false) {
+  // ====== Draw a dino (top-down/side cartoon) ======
+  function drawDino(ctx, x, y, scale, dino, pose = 'run', tick = 0) {
+    // pose: 'run', 'jump', 'slide'
+    const s = scale;
+    ctx.save();
+    ctx.translate(x, y);
+
     // Shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(x, y + r * 1.05, r * 0.7, r * 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (pose !== 'jump') {
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(0, 32 * s, 30 * s, 6 * s, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    // High heels
-    ctx.fillStyle = '#c01a5a';
-    ctx.beginPath();
-    ctx.ellipse(x - r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + r * 0.18, y + r * 1.0, r * 0.12, r * 0.08, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (pose === 'slide') {
+      ctx.translate(0, 14 * s);
+      ctx.rotate(-0.15);
+    }
 
-    // Legs (slim)
-    ctx.fillStyle = brawler.skin;
-    ctx.fillRect(x - r * 0.25, y + r * 0.55, r * 0.14, r * 0.45);
-    ctx.fillRect(x + r * 0.11, y + r * 0.55, r * 0.14, r * 0.45);
-
-    // Dress (skirt - triangular flare)
-    ctx.fillStyle = brawler.dress;
+    // Tail
+    ctx.fillStyle = dino.body;
     ctx.beginPath();
-    ctx.moveTo(x - r * 0.32, y + r * 0.15);
-    ctx.lineTo(x + r * 0.32, y + r * 0.15);
-    ctx.lineTo(x + r * 0.55, y + r * 0.62);
-    ctx.lineTo(x - r * 0.55, y + r * 0.62);
-    ctx.closePath();
-    ctx.fill();
-    // Dress sparkle
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.beginPath();
-    ctx.arc(x - r * 0.2, y + r * 0.35, r * 0.04, 0, Math.PI * 2);
-    ctx.arc(x + r * 0.15, y + r * 0.45, r * 0.04, 0, Math.PI * 2);
-    ctx.arc(x + r * 0.3, y + r * 0.3, r * 0.03, 0, Math.PI * 2);
-    ctx.fill();
-    // Dress trim
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(x - r * 0.55, y + r * 0.58, r * 1.1, r * 0.05);
-
-    // Torso (slim waist)
-    ctx.fillStyle = brawler.dress;
-    ctx.beginPath();
-    ctx.moveTo(x - r * 0.32, y - r * 0.05);
-    ctx.lineTo(x + r * 0.32, y - r * 0.05);
-    ctx.lineTo(x + r * 0.3, y + r * 0.18);
-    ctx.lineTo(x - r * 0.3, y + r * 0.18);
+    ctx.moveTo(-28 * s, 0);
+    ctx.quadraticCurveTo(-50 * s, -5 * s + Math.sin(tick * 0.3) * 4 * s, -55 * s, 0);
+    ctx.quadraticCurveTo(-45 * s, 8 * s, -28 * s, 12 * s);
     ctx.closePath();
     ctx.fill();
 
-    // Arms (slim)
-    ctx.fillStyle = brawler.skin;
-    ctx.fillRect(x - r * 0.45, y - r * 0.05, r * 0.13, r * 0.4);
-    ctx.fillRect(x + r * 0.32, y - r * 0.05, r * 0.13, r * 0.4);
-    // Hands
+    // Body
+    ctx.fillStyle = dino.body;
     ctx.beginPath();
-    ctx.arc(x - r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
-    ctx.arc(x + r * 0.39, y + r * 0.4, r * 0.1, 0, Math.PI * 2);
+    ctx.ellipse(0, 5 * s, 30 * s, 22 * s, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Long hair behind head
-    ctx.fillStyle = brawler.hair;
+    // Belly
+    ctx.fillStyle = dino.belly;
     ctx.beginPath();
-    ctx.ellipse(x, y + r * 0.05, r * 0.6, r * 0.65, 0, 0, Math.PI * 2);
+    ctx.ellipse(2 * s, 12 * s, 22 * s, 14 * s, 0, 0, Math.PI * 2);
     ctx.fill();
-    // Hair extends down
+
+    // Spikes on back
+    ctx.fillStyle = dino.spike;
+    for (let i = 0; i < 4; i++) {
+      const sx = -18 * s + i * 12 * s;
+      ctx.beginPath();
+      ctx.moveTo(sx, -10 * s);
+      ctx.lineTo(sx + 4 * s, -18 * s);
+      ctx.lineTo(sx + 8 * s, -10 * s);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Legs (running animation)
+    const legSwing = Math.sin(tick * 0.5) * 6 * s;
+    ctx.fillStyle = dino.body;
+    if (pose === 'run') {
+      ctx.fillRect(-10 * s, 22 * s, 8 * s, 14 * s + legSwing);
+      ctx.fillRect(8 * s, 22 * s, 8 * s, 14 * s - legSwing);
+    } else if (pose === 'jump') {
+      ctx.fillRect(-10 * s, 18 * s, 8 * s, 10 * s);
+      ctx.fillRect(8 * s, 18 * s, 8 * s, 10 * s);
+    } else {
+      ctx.fillRect(-12 * s, 22 * s, 22 * s, 8 * s);
+    }
+
+    // Arms
+    ctx.fillStyle = dino.body;
     ctx.beginPath();
-    ctx.moveTo(x - r * 0.55, y - r * 0.1);
-    ctx.lineTo(x - r * 0.45, y + r * 0.5);
-    ctx.lineTo(x - r * 0.2, y + r * 0.4);
-    ctx.lineTo(x - r * 0.25, y - r * 0.1);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(x + r * 0.55, y - r * 0.1);
-    ctx.lineTo(x + r * 0.45, y + r * 0.5);
-    ctx.lineTo(x + r * 0.2, y + r * 0.4);
-    ctx.lineTo(x + r * 0.25, y - r * 0.1);
-    ctx.closePath();
+    ctx.ellipse(18 * s, 8 * s, 6 * s, 10 * s, 0.3, 0, Math.PI * 2);
     ctx.fill();
 
     // Head
-    ctx.fillStyle = brawler.skin;
+    ctx.fillStyle = dino.body;
     ctx.beginPath();
-    ctx.ellipse(x, y - r * 0.25, r * 0.42, r * 0.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(30 * s, -10 * s, 22 * s, 18 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Snout
+    ctx.beginPath();
+    ctx.ellipse(46 * s, -6 * s, 12 * s, 10 * s, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hair top (fringe / bangs)
-    ctx.fillStyle = brawler.hair;
+    // Eye
+    ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.arc(x, y - r * 0.45, r * 0.45, Math.PI, Math.PI * 2);
+    ctx.arc(33 * s, -14 * s, 5 * s, 0, Math.PI * 2);
     ctx.fill();
-    // Fringe sweep
+    ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.moveTo(x - r * 0.42, y - r * 0.4);
-    ctx.quadraticCurveTo(x - r * 0.1, y - r * 0.15, x + r * 0.42, y - r * 0.35);
-    ctx.quadraticCurveTo(x + r * 0.2, y - r * 0.5, x - r * 0.42, y - r * 0.4);
+    ctx.arc(35 * s, -14 * s, 2.5 * s, 0, Math.PI * 2);
     ctx.fill();
-    // Hair shine
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(x - r * 0.15, y - r * 0.55, r * 0.1, r * 0.04, 0, 0, Math.PI * 2);
+    ctx.arc(36 * s, -15 * s, 1 * s, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyeshadow
-    ctx.fillStyle = brawler.dress;
-    ctx.globalAlpha = 0.35;
+    // Nostril
+    ctx.fillStyle = dino.spike;
     ctx.beginPath();
-    ctx.ellipse(x - r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + r * 0.18, y - r * 0.28, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Eyes
-    const eyeOffset = Math.cos(facing) * r * 0.05;
-    const eyeY = y - r * 0.22 + Math.sin(facing) * r * 0.05;
-    if (blink) {
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x - r * 0.25 + eyeOffset, eyeY);
-      ctx.lineTo(x - r * 0.1 + eyeOffset, eyeY);
-      ctx.moveTo(x + r * 0.1 + eyeOffset, eyeY);
-      ctx.lineTo(x + r * 0.25 + eyeOffset, eyeY);
-      ctx.stroke();
-    } else {
-      // White of eye
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.ellipse(x - r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
-      ctx.ellipse(x + r * 0.17 + eyeOffset, eyeY, r * 0.08, r * 0.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      // Iris (matches dress for fun)
-      ctx.fillStyle = '#3a6ec9';
-      ctx.beginPath();
-      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.06, 0, Math.PI * 2);
-      ctx.fill();
-      // Pupil
-      ctx.fillStyle = '#222';
-      ctx.beginPath();
-      ctx.arc(x - r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.17 + eyeOffset, eyeY, r * 0.03, 0, Math.PI * 2);
-      ctx.fill();
-      // Shine
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(x - r * 0.15 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
-      ctx.arc(x + r * 0.19 + eyeOffset, eyeY - r * 0.03, r * 0.015, 0, Math.PI * 2);
-      ctx.fill();
-      // Lashes
-      ctx.strokeStyle = '#222';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(x - r * 0.24 + eyeOffset, eyeY - r * 0.08);
-      ctx.lineTo(x - r * 0.27 + eyeOffset, eyeY - r * 0.13);
-      ctx.moveTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.1);
-      ctx.lineTo(x - r * 0.17 + eyeOffset, eyeY - r * 0.16);
-      ctx.moveTo(x + r * 0.24 + eyeOffset, eyeY - r * 0.08);
-      ctx.lineTo(x + r * 0.27 + eyeOffset, eyeY - r * 0.13);
-      ctx.moveTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.1);
-      ctx.lineTo(x + r * 0.17 + eyeOffset, eyeY - r * 0.16);
-      ctx.stroke();
-    }
-
-    // Blush
-    ctx.fillStyle = 'rgba(255, 100, 150, 0.4)';
-    ctx.beginPath();
-    ctx.ellipse(x - r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
-    ctx.ellipse(x + r * 0.25, y - r * 0.1, r * 0.08, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.arc(52 * s, -8 * s, 1.2 * s, 0, Math.PI * 2);
     ctx.fill();
 
-    // Lipstick smile
-    ctx.fillStyle = '#d63384';
+    // Teeth
+    ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.ellipse(x, y - r * 0.02, r * 0.1, r * 0.05, 0, 0, Math.PI * 2);
+    ctx.moveTo(40 * s, 0);
+    ctx.lineTo(42 * s, 4 * s);
+    ctx.lineTo(44 * s, 0);
+    ctx.lineTo(46 * s, 4 * s);
+    ctx.lineTo(48 * s, 0);
+    ctx.closePath();
     ctx.fill();
-    ctx.fillStyle = '#ff8ec7';
-    ctx.beginPath();
-    ctx.ellipse(x, y - r * 0.02, r * 0.06, r * 0.02, 0, 0, Math.PI * 2);
-    ctx.fill();
+
+    ctx.restore();
   }
 
-  // ====== Build brawler selection cards ======
-  const grid = document.getElementById('brawlerGrid');
-  BRAWLERS.forEach((b, i) => {
+  // ====== Dino selection cards ======
+  const grid = document.getElementById('dinoGrid');
+  DINOS.forEach(d => {
     const card = document.createElement('div');
-    card.className = 'brawler-card' + (b.id === selectedBrawlerId ? ' selected' : '');
-    card.dataset.id = b.id;
+    card.className = 'dino-card' + (d.id === selectedDinoId ? ' selected' : '');
     const cv = document.createElement('canvas');
-    cv.width = 128; cv.height = 128;
-    const cctx = cv.getContext('2d');
-    drawBaby(cctx, 64, 64, 38, b, 0);
+    cv.width = 168; cv.height = 168;
+    const c = cv.getContext('2d');
+    drawDino(c, 70, 95, 1.3, d, 'run', 0);
     card.appendChild(cv);
-    const nm = document.createElement('div');
-    nm.className = 'name';
-    nm.textContent = b.name;
-    card.appendChild(nm);
-    const ds = document.createElement('div');
-    ds.className = 'desc';
-    ds.textContent = b.desc;
-    card.appendChild(ds);
+    const nm = document.createElement('div'); nm.className = 'name'; nm.textContent = d.name; card.appendChild(nm);
+    const ds = document.createElement('div'); ds.className = 'desc'; ds.textContent = d.desc; card.appendChild(ds);
     card.addEventListener('click', () => {
-      selectedBrawlerId = b.id;
+      selectedDinoId = d.id;
       [...grid.children].forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
     });
     grid.appendChild(card);
   });
 
-  // ====== World / Arena ======
-  const TILE = 64;
-  const MAP_W = 24, MAP_H = 18;
-  // 0 = floor, 1 = wall, 2 = bush
-  let map = [];
-  function generateMap() {
-    map = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(0));
-    for (let x = 0; x < MAP_W; x++) {
-      map[0][x] = 1;
-      map[MAP_H - 1][x] = 1;
-    }
-    for (let y = 0; y < MAP_H; y++) {
-      map[y][0] = 1;
-      map[y][MAP_W - 1] = 1;
-    }
-    // Symmetric obstacles
-    const obstacles = [
-      [4,3],[5,3],[6,3],
-      [4,14],[5,14],[6,14],
-      [17,3],[18,3],[19,3],
-      [17,14],[18,14],[19,14],
-      [11,8],[12,8],[11,9],[12,9],
-      [3,7],[3,8],[3,9],[3,10],
-      [20,7],[20,8],[20,9],[20,10],
-      [11,3],[12,3],[11,14],[12,14],
-    ];
-    obstacles.forEach(([x,y]) => { if (map[y] && map[y][x] !== undefined) map[y][x] = 1; });
-    // Bushes
-    const bushes = [
-      [7,6],[8,6],[15,6],[16,6],
-      [7,11],[8,11],[15,11],[16,11],
-      [11,5],[12,5],[11,12],[12,12],
-      [2,2],[21,2],[2,15],[21,15],
-    ];
-    bushes.forEach(([x,y]) => { if (map[y] && map[y][x] !== undefined) map[y][x] = 2; });
-  }
-
   // ====== Game state ======
   let game = null;
+  const LANES = [-1, 0, 1]; // left, center, right
+  const LANE_W = 1.3;
+  const HORIZON = 0.38; // fraction of H
+  const FAR_Z = 100;
+
+  function bestKey() { return 'dinoSurfers_best'; }
+  function getBest() { return parseInt(localStorage.getItem(bestKey()) || '0', 10); }
+  function setBest(v) { localStorage.setItem(bestKey(), v); }
 
   function createGame() {
-    generateMap();
-    const me = makeBrawler(selectedBrawlerId, TILE * 3, TILE * 9, true);
-    const enemies = [];
-    const enemyIds = BRAWLERS.filter(b => b.id !== selectedBrawlerId).map(b => b.id);
-    const spawns = [[TILE*20, TILE*9], [TILE*11, TILE*3], [TILE*12, TILE*14]];
-    spawns.forEach((s, i) => {
-      enemies.push(makeBrawler(enemyIds[i % enemyIds.length], s[0], s[1], false));
-    });
     return {
-      me, enemies,
-      projectiles: [],
-      particles: [],
-      camera: { x: me.x, y: me.y },
-      score: 0,
+      dino: DINOS.find(d => d.id === selectedDinoId),
+      lane: 1,           // index in LANES
+      laneAnim: 0,       // current x in lane units (smoothed)
+      laneTarget: 0,
+      vy: 0,
+      y: 0,              // height above ground
+      jumping: false,
+      sliding: 0,        // ms remaining
+      obstacles: [],
+      bones: [],
+      decor: [],         // background zoo decor
+      speed: 0.55,
+      distance: 0,
+      bones_count: 0,
+      tick: 0,
+      spawnTimer: 0,
+      decorTimer: 0,
       over: false,
-      time: 0,
-    };
-  }
-
-  function makeBrawler(id, x, y, isPlayer) {
-    const def = BRAWLERS.find(b => b.id === id);
-    return {
-      def, id,
-      x, y, vx: 0, vy: 0,
-      r: 22,
-      hp: def.hp, maxHp: def.hp,
-      facing: 0,
-      aim: 0,
-      lastShot: 0,
-      isPlayer,
-      alive: true,
-      respawnAt: 0,
-      blink: 0,
-      super: 0,
-      aiState: { target: null, changeDir: 0, mvx: 0, mvy: 0, fireDelay: 0 },
       hitFlash: 0,
     };
   }
 
+  // ====== Projection ======
+  function project(worldX, worldY, z) {
+    const horizonY = H * HORIZON;
+    const groundDepth = H - horizonY;
+    // z=0 -> bottom, z=FAR_Z -> horizon
+    const t = Math.min(1, z / FAR_Z);
+    // Use 1/(1+z*k) for nice perspective
+    const k = 0.04;
+    const scale = 1 / (1 + z * k);
+    const screenY = horizonY + groundDepth * (1 - scale) / (1 - 1/(1+FAR_Z*k)) ;
+    const cx = W / 2;
+    const screenX = cx + worldX * (W * 0.18) * scale;
+    return { x: screenX, y: screenY - worldY * scale * (H * 0.22), scale };
+  }
+
+  // ====== Obstacle types (zoo themed) ======
+  const OBSTACLE_TYPES = [
+    { id: 'cage',    type: 'block',  w: 0.9, h: 1.0, color: '#6b7280', accent: '#374151' }, // cage - must change lane
+    { id: 'trough',  type: 'jump',   w: 0.9, h: 0.35, color: '#3b82f6', accent: '#1e40af' }, // water trough - jump
+    { id: 'gate',    type: 'slide',  w: 1.1, h: 0.4, gap: 0.55, color: '#a16207', accent: '#78350f' }, // overhead bar - slide
+    { id: 'haystack',type: 'jump',   w: 0.9, h: 0.5, color: '#facc15', accent: '#a16207' },
+    { id: 'statue',  type: 'block',  w: 0.7, h: 1.1, color: '#d6d3d1', accent: '#78716c' },
+  ];
+
+  function spawnObstacle() {
+    const type = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
+    // Sometimes occupy 1-2 lanes
+    const wide = Math.random() < 0.15 && type.type === 'slide';
+    const lane = Math.floor(Math.random() * 3);
+    game.obstacles.push({
+      lane, type, z: FAR_Z, wide,
+      y: 0,
+    });
+  }
+  function spawnBonesRow() {
+    const lane = Math.floor(Math.random() * 3);
+    const count = 3 + Math.floor(Math.random() * 4);
+    const above = Math.random() < 0.25; // bone above (need jump)
+    for (let i = 0; i < count; i++) {
+      game.bones.push({ lane, z: FAR_Z + i * 5, y: above ? 0.6 : 0.15, collected: false });
+    }
+  }
+  function spawnDecor() {
+    // Trees, signs, animal enclosures on the sides
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const kind = Math.floor(Math.random() * 4);
+    game.decor.push({ side, x: side * (2.2 + Math.random() * 1.2), z: FAR_Z, kind });
+  }
+
   // ====== Input ======
   const keys = {};
-  let mouse = { x: 0, y: 0, down: false };
-  window.addEventListener('keydown', e => {
-    keys[e.key.toLowerCase()] = true;
-    if (e.key === ' ' && game && game.me.alive && game.me.super >= 100) {
-      fireSuper(game.me);
-    }
+  addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (k === 'a' || k === 'arrowleft') moveLane(-1);
+    if (k === 'd' || k === 'arrowright') moveLane(1);
+    if (k === 'w' || k === 'arrowup' || k === ' ') jump();
+    if (k === 's' || k === 'arrowdown') slide();
+    keys[k] = true;
   });
-  window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = (e.clientX - rect.left) * devicePixelRatio;
-    mouse.y = (e.clientY - rect.top) * devicePixelRatio;
-  });
-  canvas.addEventListener('mousedown', () => { mouse.down = true; });
-  canvas.addEventListener('mouseup', () => { mouse.down = false; });
+  addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-  // Touch joystick
-  const joy = { active: false, id: null, sx: 0, sy: 0, dx: 0, dy: 0 };
-  const joyEl = document.getElementById('joyMove');
-  const joyKnob = joyEl.querySelector('.knob');
-  joyEl.addEventListener('touchstart', e => {
+  // Touch / swipe
+  let touchStart = null;
+  const touchZone = document.getElementById('touchZone');
+  touchZone.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    touchStart = { x: t.clientX, y: t.clientY, time: performance.now() };
+    e.preventDefault();
+  }, { passive: false });
+  touchZone.addEventListener('touchend', e => {
+    if (!touchStart) return;
     const t = e.changedTouches[0];
-    joy.active = true; joy.id = t.identifier;
-    const rect = joyEl.getBoundingClientRect();
-    joy.sx = rect.left + rect.width / 2;
-    joy.sy = rect.top + rect.height / 2;
-    updateJoy(t.clientX, t.clientY);
-  });
-  joyEl.addEventListener('touchmove', e => {
-    for (const t of e.changedTouches) {
-      if (t.identifier === joy.id) updateJoy(t.clientX, t.clientY);
+    const dx = t.clientX - touchStart.x;
+    const dy = t.clientY - touchStart.y;
+    const dt = performance.now() - touchStart.time;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+    if (Math.max(adx, ady) < 25 && dt < 250) {
+      jump(); // tap = jump
+    } else if (adx > ady) {
+      if (dx > 0) moveLane(1); else moveLane(-1);
+    } else {
+      if (dy < 0) jump(); else slide();
     }
-    e.preventDefault();
-  }, { passive: false });
-  joyEl.addEventListener('touchend', e => {
-    for (const t of e.changedTouches) {
-      if (t.identifier === joy.id) { joy.active = false; joy.dx = 0; joy.dy = 0; joyKnob.style.transform = 'translate(-50%,-50%)'; }
-    }
-  });
-  function updateJoy(cx, cy) {
-    let dx = cx - joy.sx, dy = cy - joy.sy;
-    const max = 50;
-    const d = Math.hypot(dx, dy);
-    if (d > max) { dx = dx * max / d; dy = dy * max / d; }
-    joy.dx = dx / max; joy.dy = dy / max;
-    joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-  }
-  const shootBtn = document.getElementById('btnShoot');
-  let touchShoot = false;
-  shootBtn.addEventListener('touchstart', e => { touchShoot = true; e.preventDefault(); }, { passive: false });
-  shootBtn.addEventListener('touchend', () => { touchShoot = false; });
-  const superBtn = document.getElementById('btnSuper');
-  superBtn.addEventListener('touchstart', e => {
-    if (game && game.me.alive && game.me.super >= 100) fireSuper(game.me);
+    touchStart = null;
     e.preventDefault();
   }, { passive: false });
 
-  // ====== Physics & collision ======
-  function tileAt(x, y) {
-    const tx = Math.floor(x / TILE), ty = Math.floor(y / TILE);
-    if (ty < 0 || ty >= MAP_H || tx < 0 || tx >= MAP_W) return 1;
-    return map[ty][tx];
+  function moveLane(dir) {
+    if (!game || game.over) return;
+    game.lane = Math.max(0, Math.min(2, game.lane + dir));
   }
-  function isWall(x, y) { return tileAt(x, y) === 1; }
-
-  function moveBrawler(b, dx, dy) {
-    const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 4));
-    for (let s = 0; s < steps; s++) {
-      const nx = b.x + dx / steps;
-      if (!isWall(nx + Math.sign(dx) * b.r, b.y - b.r * 0.3) &&
-          !isWall(nx + Math.sign(dx) * b.r, b.y + b.r * 0.5)) {
-        b.x = nx;
-      }
-      const ny = b.y + dy / steps;
-      if (!isWall(b.x - b.r * 0.6, ny + Math.sign(dy) * b.r * 0.8) &&
-          !isWall(b.x + b.r * 0.6, ny + Math.sign(dy) * b.r * 0.8)) {
-        b.y = ny;
-      }
+  function jump() {
+    if (!game || game.over) return;
+    if (!game.jumping && game.y === 0) {
+      game.vy = 0.32;
+      game.jumping = true;
+      game.sliding = 0;
     }
   }
-
-  // ====== Shooting ======
-  function tryShoot(b) {
-    const now = performance.now();
-    if (now - b.lastShot < b.def.fireRate) return;
-    b.lastShot = now;
-    const def = b.def;
-    const count = def.id === 'shot' ? 5 : 1;
-    for (let i = 0; i < count; i++) {
-      const spread = (Math.random() - 0.5) * def.spread + (count > 1 ? (i - (count-1)/2) * 0.12 : 0);
-      const a = b.aim + spread;
-      game.projectiles.push({
-        x: b.x + Math.cos(a) * b.r,
-        y: b.y + Math.sin(a) * b.r,
-        vx: Math.cos(a) * def.projSpeed,
-        vy: Math.sin(a) * def.projSpeed,
-        r: def.projSize,
-        dmg: def.dmg,
-        owner: b,
-        life: 60,
-        color: def.dress,
-      });
+  function slide() {
+    if (!game || game.over) return;
+    if (game.y === 0) {
+      game.sliding = 600;
+    } else {
+      game.vy = -0.25; // fast fall
     }
-  }
-  function fireSuper(b) {
-    b.super = 0;
-    // Big burst in 12 directions
-    for (let i = 0; i < 16; i++) {
-      const a = (i / 16) * Math.PI * 2;
-      game.projectiles.push({
-        x: b.x, y: b.y,
-        vx: Math.cos(a) * 10,
-        vy: Math.sin(a) * 10,
-        r: 12,
-        dmg: 25,
-        owner: b,
-        life: 50,
-        color: '#fff700',
-        isSuper: true,
-      });
-    }
-    for (let i = 0; i < 40; i++) {
-      game.particles.push({
-        x: b.x, y: b.y,
-        vx: (Math.random()-0.5)*8,
-        vy: (Math.random()-0.5)*8,
-        life: 30, color: '#ffd900', r: 4,
-      });
-    }
-  }
-
-  // ====== AI ======
-  function updateAI(b, dt) {
-    if (!b.alive) return;
-    const ai = b.aiState;
-    // Find closest alive target
-    const targets = [game.me, ...game.enemies].filter(t => t !== b && t.alive);
-    let best = null, bd = Infinity;
-    for (const t of targets) {
-      const d = Math.hypot(t.x - b.x, t.y - b.y);
-      if (d < bd) { bd = d; best = t; }
-    }
-    ai.target = best;
-    if (best) {
-      const dx = best.x - b.x, dy = best.y - b.y;
-      b.aim = Math.atan2(dy, dx);
-      const dist = Math.hypot(dx, dy);
-      // Movement: approach or strafe
-      ai.changeDir -= dt;
-      if (ai.changeDir <= 0) {
-        ai.changeDir = 400 + Math.random() * 800;
-        const desired = 220;
-        const a = b.aim + (Math.random() - 0.5) * 0.8;
-        if (dist > desired + 40) {
-          ai.mvx = Math.cos(a); ai.mvy = Math.sin(a);
-        } else if (dist < desired - 40) {
-          ai.mvx = -Math.cos(a); ai.mvy = -Math.sin(a);
-        } else {
-          const s = Math.random() < 0.5 ? 1 : -1;
-          ai.mvx = -Math.sin(a) * s; ai.mvy = Math.cos(a) * s;
-        }
-      }
-      moveBrawler(b, ai.mvx * b.def.speed * 0.85, ai.mvy * b.def.speed * 0.85);
-      b.facing = b.aim;
-      // Shoot if has line of sight (basic)
-      if (dist < 380 && hasLineOfSight(b, best)) {
-        tryShoot(b);
-      }
-      // Use super when full
-      if (b.super >= 100 && dist < 200) fireSuper(b);
-    }
-  }
-  function hasLineOfSight(a, b) {
-    const dx = b.x - a.x, dy = b.y - a.y;
-    const d = Math.hypot(dx, dy);
-    const steps = Math.ceil(d / TILE);
-    for (let i = 1; i < steps; i++) {
-      const t = i / steps;
-      const x = a.x + dx * t, y = a.y + dy * t;
-      if (tileAt(x, y) === 1) return false;
-    }
-    return true;
   }
 
   // ====== Update ======
   function update(dt) {
     if (game.over) return;
-    game.time += dt;
-    const me = game.me;
+    game.tick += dt * 0.06;
+    const dts = dt / 16.67; // normalized to 60fps
 
-    // Player input
-    if (me.alive) {
-      let mx = 0, my = 0;
-      if (keys['w'] || keys['arrowup']) my -= 1;
-      if (keys['s'] || keys['arrowdown']) my += 1;
-      if (keys['a'] || keys['arrowleft']) mx -= 1;
-      if (keys['d'] || keys['arrowright']) mx += 1;
-      if (joy.active) { mx = joy.dx; my = joy.dy; }
-      const len = Math.hypot(mx, my);
-      if (len > 1) { mx /= len; my /= len; }
-      moveBrawler(me, mx * me.def.speed, my * me.def.speed);
+    // Speed ramp
+    game.speed = Math.min(1.2, 0.55 + game.distance / 2200);
 
-      // Aim: mouse OR auto-aim to nearest enemy on mobile
-      if (joy.active || touchShoot) {
-        // auto-aim to nearest enemy
-        let best = null, bd = Infinity;
-        for (const e of game.enemies) {
-          if (!e.alive) continue;
-          const d = Math.hypot(e.x - me.x, e.y - me.y);
-          if (d < bd) { bd = d; best = e; }
-        }
-        if (best) me.aim = Math.atan2(best.y - me.y, best.x - me.x);
-        else if (mx || my) me.aim = Math.atan2(my, mx);
-      } else {
-        const wx = me.x - game.camera.x + W / 2;
-        const wy = me.y - game.camera.y + H / 2;
-        me.aim = Math.atan2(mouse.y - wy, mouse.x - wx);
-      }
-      me.facing = me.aim;
+    // Distance
+    game.distance += game.speed * dts * 2;
 
-      if (mouse.down || touchShoot) tryShoot(me);
-    } else {
-      me.respawnAt -= dt;
-      if (me.respawnAt <= 0) respawn(me);
-    }
+    // Lane interpolation
+    const targetX = LANES[game.lane] * LANE_W;
+    game.laneAnim += (targetX - game.laneAnim) * 0.2 * dts;
 
-    // Enemies AI
-    for (const e of game.enemies) {
-      if (e.alive) updateAI(e, dt);
-      else {
-        e.respawnAt -= dt;
-        if (e.respawnAt <= 0) respawn(e);
+    // Jump physics
+    if (game.jumping || game.y > 0) {
+      game.y += game.vy * dts;
+      game.vy -= 0.022 * dts;
+      if (game.y <= 0) {
+        game.y = 0; game.vy = 0; game.jumping = false;
       }
     }
+    // Sliding
+    if (game.sliding > 0) {
+      game.sliding -= dt;
+      if (game.sliding < 0) game.sliding = 0;
+    }
 
-    // Projectiles
-    for (let i = game.projectiles.length - 1; i >= 0; i--) {
-      const p = game.projectiles[i];
-      p.x += p.vx; p.y += p.vy;
-      p.life--;
-      if (p.life <= 0 || isWall(p.x, p.y)) {
-        game.projectiles.splice(i, 1);
-        for (let k = 0; k < 6; k++) {
-          game.particles.push({
-            x: p.x, y: p.y,
-            vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4,
-            life: 15, color: p.color, r: 2 + Math.random() * 2,
-          });
-        }
-        continue;
-      }
-      // Hit detection
-      const targets = [game.me, ...game.enemies];
-      for (const t of targets) {
-        if (!t.alive || t === p.owner) continue;
-        if (Math.hypot(t.x - p.x, t.y - p.y) < t.r + p.r) {
-          t.hp -= p.dmg;
-          t.hitFlash = 8;
-          // Super charge
-          if (p.owner) p.owner.super = Math.min(100, p.owner.super + (p.isSuper ? 5 : 12));
-          // particles
-          for (let k = 0; k < 8; k++) {
-            game.particles.push({
-              x: p.x, y: p.y,
-              vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5,
-              life: 20, color: '#ff4fa3', r: 2 + Math.random() * 3,
-            });
+    // Move world toward player
+    const moveZ = game.speed * dts;
+    for (const o of game.obstacles) o.z -= moveZ;
+    for (const b of game.bones) b.z -= moveZ;
+    for (const d of game.decor) d.z -= moveZ;
+
+    // Cull
+    game.obstacles = game.obstacles.filter(o => o.z > -3);
+    game.bones = game.bones.filter(b => b.z > -3 && !b.collected);
+    game.decor = game.decor.filter(d => d.z > -3);
+
+    // Spawn
+    game.spawnTimer -= dt;
+    if (game.spawnTimer <= 0) {
+      const r = Math.random();
+      if (r < 0.65) spawnObstacle();
+      else spawnBonesRow();
+      game.spawnTimer = 700 + Math.random() * 600 - game.speed * 200;
+    }
+    game.decorTimer -= dt;
+    if (game.decorTimer <= 0) {
+      spawnDecor();
+      game.decorTimer = 200 + Math.random() * 300;
+    }
+
+    // Collision
+    const playerLaneX = game.laneAnim;
+    const playerHeight = game.sliding > 0 ? 0.3 : 1.0;
+    const playerY = game.y;
+    for (const o of game.obstacles) {
+      if (Math.abs(o.z) < 0.8) {
+        const oLaneX = LANES[o.lane] * LANE_W;
+        const dx = Math.abs(playerLaneX - oLaneX);
+        if (dx < o.type.w * 0.5 + 0.35 || (o.wide && true)) {
+          // Vertical check
+          if (o.type.type === 'jump') {
+            if (playerY < o.type.h) collide();
+          } else if (o.type.type === 'slide') {
+            // pole at height = gap...gap+h
+            if (playerY + playerHeight > o.type.gap) collide();
+          } else { // block
+            if (playerY < o.type.h) collide();
           }
-          if (t.hp <= 0) {
-            t.alive = false;
-            t.respawnAt = 3000;
-            // Big particles
-            for (let k = 0; k < 30; k++) {
-              game.particles.push({
-                x: t.x, y: t.y,
-                vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8,
-                life: 40, color: ['#ff4fa3','#ffd900','#fff'][k%3], r: 3 + Math.random() * 4,
-              });
-            }
-            if (p.owner === me) {
-              game.score++;
-              if (game.score >= 5) endGame(true);
-            } else if (t === me) {
-              if (game.score < -2) endGame(false);
-            }
+        }
+      }
+    }
+    for (const b of game.bones) {
+      if (Math.abs(b.z) < 0.6) {
+        const oLaneX = LANES[b.lane] * LANE_W;
+        const dx = Math.abs(playerLaneX - oLaneX);
+        if (dx < 0.5) {
+          const dy = Math.abs(playerY - b.y);
+          if (dy < 0.5) {
+            b.collected = true;
+            game.bones_count++;
           }
-          game.projectiles.splice(i, 1);
-          break;
         }
       }
     }
 
-    // Particles
-    for (let i = game.particles.length - 1; i >= 0; i--) {
-      const pa = game.particles[i];
-      pa.x += pa.vx; pa.y += pa.vy;
-      pa.vx *= 0.92; pa.vy *= 0.92;
-      pa.life--;
-      if (pa.life <= 0) game.particles.splice(i, 1);
-    }
-
-    // Hit flashes
-    for (const b of [me, ...game.enemies]) if (b.hitFlash > 0) b.hitFlash--;
-
-    // Camera follow
-    game.camera.x += (me.x - game.camera.x) * 0.1;
-    game.camera.y += (me.y - game.camera.y) * 0.1;
+    if (game.hitFlash > 0) game.hitFlash -= dt;
 
     // HUD
-    document.getElementById('hpStat').textContent = me.alive ? `HP ${Math.max(0, Math.ceil(me.hp))}` : `RESPAWN ${(me.respawnAt/1000).toFixed(1)}s`;
-    document.getElementById('scoreStat').textContent = `KOs: ${game.score}/5`;
-    document.getElementById('superStat').textContent = `Super ${Math.floor(me.super)}%`;
-    superBtn.classList.toggle('ready', me.super >= 100);
+    document.getElementById('scoreStat').textContent = `🏃 ${Math.floor(game.distance)}m`;
+    document.getElementById('boneStat').textContent = `🦴 ${game.bones_count}`;
+    document.getElementById('bestStat').textContent = `⭐ ${getBest()}m`;
   }
 
-  function respawn(b) {
-    b.alive = true;
-    b.hp = b.maxHp;
-    b.super = 0;
-    if (b.isPlayer) { b.x = TILE * 3; b.y = TILE * 9; }
-    else {
-      const corners = [[TILE*20, TILE*9], [TILE*11, TILE*3], [TILE*12, TILE*14]];
-      const c = corners[Math.floor(Math.random() * corners.length)];
-      b.x = c[0]; b.y = c[1];
-    }
+  function collide() {
+    if (game.hitFlash > 0) return;
+    endGame();
   }
 
-  function endGame(won) {
+  function endGame() {
     game.over = true;
-    document.getElementById('endTitle').textContent = won ? '🏆 SIEG! 🏆' : '💔 Niederlage';
-    document.getElementById('endText').textContent = won
-      ? `Du hast die pinke Arena mit ${game.score} KOs erobert!`
-      : 'Die anderen Barbies waren stärker... Versuch es nochmal!';
+    const score = Math.floor(game.distance);
+    if (score > getBest()) setBest(score);
+    document.getElementById('endTitle').textContent = '💥 Erwischt!';
+    document.getElementById('endText').textContent = `Strecke: ${score}m · Knochen: ${game.bones_count} · Bester: ${getBest()}m`;
     document.getElementById('endScreen').classList.remove('hidden');
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('hint').classList.add('hidden');
+    document.getElementById('touchZone').classList.add('hidden');
   }
 
   // ====== Render ======
-  function isPlayerInBush(b) {
-    return tileAt(b.x, b.y) === 2;
+  function drawSky() {
+    // Sky gradient
+    const sg = ctx.createLinearGradient(0, 0, 0, H * HORIZON);
+    sg.addColorStop(0, '#7dd3fc');
+    sg.addColorStop(1, '#fde68a');
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, 0, W, H * HORIZON);
+    // Sun
+    ctx.fillStyle = '#fef3c7';
+    ctx.beginPath();
+    ctx.arc(W * 0.78, H * 0.18, H * 0.07, 0, Math.PI * 2);
+    ctx.fill();
+    // Distant zoo silhouette
+    ctx.fillStyle = '#65a30d';
+    const horizonY = H * HORIZON;
+    ctx.beginPath();
+    ctx.moveTo(0, horizonY);
+    let x = 0;
+    while (x < W) {
+      const h = 20 + Math.sin(x * 0.013 + 3) * 12 + Math.sin(x * 0.007) * 18;
+      ctx.lineTo(x, horizonY - h);
+      x += 30;
+    }
+    ctx.lineTo(W, horizonY);
+    ctx.closePath();
+    ctx.fill();
+    // Zoo entrance arch (far)
+    ctx.fillStyle = '#a16207';
+    const ax = W * 0.5, ay = horizonY - 50;
+    ctx.fillRect(ax - 60, ay, 12, 50);
+    ctx.fillRect(ax + 48, ay, 12, 50);
+    ctx.fillRect(ax - 60, ay - 8, 120, 12);
+    ctx.fillStyle = '#dc2626';
+    ctx.font = `bold ${Math.floor(H * 0.015)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('ZOO', ax, ay - 12);
   }
 
-  function render() {
-    ctx.fillStyle = '#ffb3da';
-    ctx.fillRect(0, 0, W, H);
+  function drawGround() {
+    const horizonY = H * HORIZON;
+    // Ground gradient
+    const gg = ctx.createLinearGradient(0, horizonY, 0, H);
+    gg.addColorStop(0, '#86efac');
+    gg.addColorStop(1, '#16a34a');
+    ctx.fillStyle = gg;
+    ctx.fillRect(0, horizonY, W, H - horizonY);
 
-    ctx.save();
-    ctx.translate(W/2 - game.camera.x, H/2 - game.camera.y);
+    // Path - draw as projected quad
+    const farL = project(-LANE_W * 1.7, 0, FAR_Z);
+    const farR = project(LANE_W * 1.7, 0, FAR_Z);
+    const nearL = project(-LANE_W * 1.7, 0, 0);
+    const nearR = project(LANE_W * 1.7, 0, 0);
+    ctx.fillStyle = '#d6c898';
+    ctx.beginPath();
+    ctx.moveTo(farL.x, farL.y);
+    ctx.lineTo(farR.x, farR.y);
+    ctx.lineTo(nearR.x, nearR.y);
+    ctx.lineTo(nearL.x, nearL.y);
+    ctx.closePath();
+    ctx.fill();
 
-    // Draw map tiles
-    const cx = game.camera.x, cy = game.camera.y;
-    const vw = W / 2 + TILE, vh = H / 2 + TILE;
-    const x0 = Math.max(0, Math.floor((cx - vw) / TILE));
-    const x1 = Math.min(MAP_W - 1, Math.ceil((cx + vw) / TILE));
-    const y0 = Math.max(0, Math.floor((cy - vh) / TILE));
-    const y1 = Math.min(MAP_H - 1, Math.ceil((cy + vh) / TILE));
+    // Path borders
+    ctx.strokeStyle = '#854d0e';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(farL.x, farL.y); ctx.lineTo(nearL.x, nearL.y);
+    ctx.moveTo(farR.x, farR.y); ctx.lineTo(nearR.x, nearR.y);
+    ctx.stroke();
 
-    for (let y = y0; y <= y1; y++) {
-      for (let x = x0; x <= x1; x++) {
-        const t = map[y][x];
-        const px = x * TILE, py = y * TILE;
-        if (t === 0) {
-          ctx.fillStyle = (x + y) % 2 ? '#ffc1e0' : '#ffb3d8';
-          ctx.fillRect(px, py, TILE, TILE);
-          // little hearts
-          if ((x*7+y*13) % 11 === 0) {
-            ctx.fillStyle = 'rgba(214,51,132,0.2)';
-            ctx.beginPath();
-            ctx.arc(px + TILE*0.4, py + TILE*0.5, 4, 0, Math.PI*2);
-            ctx.arc(px + TILE*0.6, py + TILE*0.5, 4, 0, Math.PI*2);
-            ctx.moveTo(px + TILE*0.3, py + TILE*0.55);
-            ctx.lineTo(px + TILE*0.5, py + TILE*0.75);
-            ctx.lineTo(px + TILE*0.7, py + TILE*0.55);
-            ctx.fill();
-          }
-        } else if (t === 1) {
-          // Wall (block)
-          ctx.fillStyle = '#a8246e';
-          ctx.fillRect(px, py, TILE, TILE);
-          ctx.fillStyle = '#c93384';
-          ctx.fillRect(px+3, py+3, TILE-6, TILE-12);
-          ctx.fillStyle = '#7a1955';
-          ctx.fillRect(px+3, py+TILE-9, TILE-6, 6);
-        } else if (t === 2) {
-          ctx.fillStyle = (x+y)%2 ? '#ffc1e0' : '#ffb3d8';
-          ctx.fillRect(px, py, TILE, TILE);
-          // Bush
-          ctx.fillStyle = '#d63384';
-          ctx.beginPath();
-          ctx.arc(px + TILE*0.3, py + TILE*0.5, TILE*0.28, 0, Math.PI*2);
-          ctx.arc(px + TILE*0.6, py + TILE*0.4, TILE*0.3, 0, Math.PI*2);
-          ctx.arc(px + TILE*0.7, py + TILE*0.65, TILE*0.26, 0, Math.PI*2);
-          ctx.arc(px + TILE*0.4, py + TILE*0.7, TILE*0.24, 0, Math.PI*2);
-          ctx.fill();
-          ctx.fillStyle = '#ff8ec7';
-          ctx.beginPath();
-          ctx.arc(px + TILE*0.45, py + TILE*0.45, TILE*0.08, 0, Math.PI*2);
-          ctx.arc(px + TILE*0.65, py + TILE*0.55, TILE*0.07, 0, Math.PI*2);
-          ctx.fill();
-        }
-      }
-    }
-
-    // Particles (under brawlers)
-    for (const p of game.particles) {
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.min(1, p.life / 20);
+    // Lane stripes (zoo style: paw prints/dashed)
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 14]);
+    for (let i = -1; i <= 1; i += 2) {
+      const fL = project(i * LANE_W * 0.5, 0, FAR_Z);
+      const nL = project(i * LANE_W * 0.5, 0, 0);
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    }
-
-    // Brawlers
-    const all = [game.me, ...game.enemies];
-    const meInBush = isPlayerInBush(game.me);
-    for (const b of all) {
-      if (!b.alive) continue;
-      const inBush = isPlayerInBush(b);
-      // hide enemies in bush unless I'm next to them
-      if (!b.isPlayer && inBush) {
-        const dToMe = Math.hypot(b.x - game.me.x, b.y - game.me.y);
-        if (dToMe > 90) continue;
-      }
-      if (b.hitFlash > 0) {
-        ctx.save();
-        ctx.filter = 'brightness(2.5)';
-      }
-      drawBaby(ctx, b.x, b.y, b.r, b.def, b.facing, Math.floor(game.time / 200) % 20 === 0);
-      if (b.hitFlash > 0) ctx.restore();
-
-      // HP bar
-      const hpw = b.r * 1.8;
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6, hpw, 6);
-      ctx.fillStyle = b.isPlayer ? '#7fff7f' : '#ff5566';
-      ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6, hpw * (b.hp / b.maxHp), 6);
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 1;
-      ctx.strokeRect(b.x - hpw/2, b.y - b.r * 1.6, hpw, 6);
-
-      // Super bar
-      if (b.super > 0) {
-        ctx.fillStyle = '#ffd900';
-        ctx.fillRect(b.x - hpw/2, b.y - b.r * 1.6 - 5, hpw * (b.super / 100), 3);
-      }
-
-      // Name tag
-      if (b.isPlayer) {
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(b.def.name, b.x, b.y - b.r * 1.8);
-      }
-    }
-
-    // Projectiles
-    for (const p of game.projectiles) {
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fill();
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
+      ctx.moveTo(fL.x, fL.y);
+      ctx.lineTo(nL.x, nL.y);
       ctx.stroke();
-      if (p.isSuper) {
-        ctx.fillStyle = 'rgba(255, 217, 0, 0.4)';
+    }
+    ctx.setLineDash([]);
+
+    // Moving stripes for speed feel
+    const dashLen = 1.0;
+    const offset = (game.distance * 0.5) % dashLen;
+    for (let z = -offset; z < FAR_Z; z += dashLen * 2) {
+      if (z < 0) continue;
+      const p1 = project(0, 0, z);
+      const p2 = project(0, 0, z + dashLen);
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = Math.max(1, 4 * p1.scale);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+  }
+
+  function drawDecor(d) {
+    const p = project(d.x, 0, d.z);
+    const s = p.scale;
+    if (s <= 0.01) return;
+    if (d.kind === 0) {
+      // Palm / tree
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(p.x - 4 * s, p.y - 80 * s, 8 * s, 80 * s);
+      ctx.fillStyle = '#15803d';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 85 * s, 30 * s, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#16a34a';
+      ctx.beginPath();
+      ctx.arc(p.x - 10 * s, p.y - 95 * s, 20 * s, 0, Math.PI * 2);
+      ctx.arc(p.x + 12 * s, p.y - 92 * s, 22 * s, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (d.kind === 1) {
+      // Sign (zoo direction)
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(p.x - 3 * s, p.y - 60 * s, 6 * s, 60 * s);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(p.x - 30 * s, p.y - 60 * s, 60 * s, 24 * s);
+      ctx.strokeStyle = '#78350f';
+      ctx.lineWidth = 2 * s;
+      ctx.strokeRect(p.x - 30 * s, p.y - 60 * s, 60 * s, 24 * s);
+      ctx.fillStyle = '#7c2d12';
+      ctx.font = `bold ${Math.max(6, 14 * s)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🦁', p.x, p.y - 48 * s);
+    } else if (d.kind === 2) {
+      // Animal enclosure fence
+      ctx.fillStyle = '#a16207';
+      for (let i = 0; i < 5; i++) {
+        ctx.fillRect(p.x - 25 * s + i * 12 * s, p.y - 35 * s, 4 * s, 35 * s);
+      }
+      ctx.fillRect(p.x - 25 * s, p.y - 28 * s, 60 * s, 4 * s);
+      ctx.fillRect(p.x - 25 * s, p.y - 12 * s, 60 * s, 4 * s);
+      // A peeking animal
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - 22 * s, 10 * s, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(p.x - 3 * s, p.y - 24 * s, 1.5 * s, 0, Math.PI * 2);
+      ctx.arc(p.x + 3 * s, p.y - 24 * s, 1.5 * s, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Bush
+      ctx.fillStyle = '#166534';
+      ctx.beginPath();
+      ctx.arc(p.x - 8 * s, p.y - 8 * s, 14 * s, 0, Math.PI * 2);
+      ctx.arc(p.x + 8 * s, p.y - 10 * s, 16 * s, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y - 14 * s, 16 * s, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawObstacle(o) {
+    const oLaneX = LANES[o.lane] * LANE_W;
+    const p = project(oLaneX, 0, o.z);
+    const s = p.scale;
+    if (s <= 0.01) return;
+    const t = o.type;
+    if (t.id === 'cage') {
+      // Animal cage (block)
+      const w = 80 * s, h = 110 * s;
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillRect(p.x - w/2, p.y - h, w, h);
+      // Bars
+      ctx.strokeStyle = '#374151';
+      ctx.lineWidth = Math.max(1, 3 * s);
+      for (let i = 0; i < 5; i++) {
+        const bx = p.x - w/2 + (i+0.5) * w/5;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 1.7, 0, Math.PI*2);
-        ctx.fill();
+        ctx.moveTo(bx, p.y - h + 12 * s); ctx.lineTo(bx, p.y);
+        ctx.stroke();
       }
-    }
-
-    // Aim indicator for player
-    if (game.me.alive) {
-      const me = game.me;
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 6]);
+      // Roof
+      ctx.fillStyle = '#dc2626';
       ctx.beginPath();
-      ctx.moveTo(me.x + Math.cos(me.aim) * me.r, me.y + Math.sin(me.aim) * me.r);
-      ctx.lineTo(me.x + Math.cos(me.aim) * 260, me.y + Math.sin(me.aim) * 260);
+      ctx.moveTo(p.x - w/2 - 6*s, p.y - h);
+      ctx.lineTo(p.x, p.y - h - 22*s);
+      ctx.lineTo(p.x + w/2 + 6*s, p.y - h);
+      ctx.closePath();
+      ctx.fill();
+      // Caged animal eyes
+      ctx.fillStyle = '#fef3c7';
+      ctx.beginPath();
+      ctx.arc(p.x - 8*s, p.y - h/2, 4*s, 0, Math.PI*2);
+      ctx.arc(p.x + 8*s, p.y - h/2, 4*s, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(p.x - 8*s, p.y - h/2, 2*s, 0, Math.PI*2);
+      ctx.arc(p.x + 8*s, p.y - h/2, 2*s, 0, Math.PI*2);
+      ctx.fill();
+    } else if (t.id === 'trough') {
+      // Water trough (low, jump over)
+      const w = 90 * s, h = 30 * s;
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(p.x - w/2, p.y - h, w, h);
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(p.x - w/2 + 4*s, p.y - h + 4*s, w - 8*s, h * 0.5);
+      // Wavy water
+      ctx.strokeStyle = '#bfdbfe';
+      ctx.lineWidth = Math.max(1, 2*s);
+      ctx.beginPath();
+      for (let i = 0; i < w; i += 8*s) {
+        const wy = p.y - h + 6*s + Math.sin((i + game.tick*4) * 0.1) * 2*s;
+        if (i === 0) ctx.moveTo(p.x - w/2 + 4*s, wy);
+        else ctx.lineTo(p.x - w/2 + 4*s + i, wy);
+      }
       ctx.stroke();
-      ctx.setLineDash([]);
+    } else if (t.id === 'gate') {
+      // Overhead bar - slide under
+      const w = 110 * s, h = 16 * s;
+      const barY = p.y - 70 * s;
+      // Posts
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(p.x - w/2 - 4*s, p.y - 90*s, 8*s, 90*s);
+      ctx.fillRect(p.x + w/2 - 4*s, p.y - 90*s, 8*s, 90*s);
+      // Bar
+      ctx.fillStyle = '#a16207';
+      ctx.fillRect(p.x - w/2, barY, w, h);
+      // Sign on bar
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(p.x - 20*s, barY - 20*s, 40*s, 20*s);
+      ctx.fillStyle = '#7c2d12';
+      ctx.font = `bold ${Math.max(8, 14*s)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🐘', p.x, barY - 10*s);
+    } else if (t.id === 'haystack') {
+      const w = 80 * s, h = 50 * s;
+      ctx.fillStyle = '#facc15';
+      ctx.beginPath();
+      ctx.ellipse(p.x, p.y - h/2, w/2, h/2, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = '#a16207';
+      ctx.lineWidth = Math.max(1, 1.5*s);
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(p.x - w/2 + i * w/5, p.y - h + 4*s);
+        ctx.lineTo(p.x - w/2 + i * w/5 + 6*s, p.y - 2*s);
+        ctx.stroke();
+      }
+    } else if (t.id === 'statue') {
+      // Animal statue (elephant-ish)
+      const w = 60 * s, h = 110 * s;
+      ctx.fillStyle = '#a8a29e';
+      ctx.fillRect(p.x - w/2, p.y - h * 0.3, w, h * 0.3);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - h * 0.5, w * 0.6, 0, Math.PI*2);
+      ctx.fill();
+      // Trunk
+      ctx.fillStyle = '#78716c';
+      ctx.fillRect(p.x - 4*s, p.y - h * 0.5, 8*s, h * 0.3);
+      // Base
+      ctx.fillStyle = '#d6d3d1';
+      ctx.fillRect(p.x - w/2 - 6*s, p.y - 8*s, w + 12*s, 8*s);
     }
+  }
 
+  function drawBone(b) {
+    const oLaneX = LANES[b.lane] * LANE_W;
+    const p = project(oLaneX, b.y, b.z);
+    const s = p.scale;
+    if (s <= 0.01) return;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(game.tick * 0.1 + b.z * 0.2);
+    ctx.fillStyle = '#fef3c7';
+    ctx.strokeStyle = '#a16207';
+    ctx.lineWidth = Math.max(1, 1.5 * s);
+    // Bone shape
+    const len = 20 * s;
+    ctx.beginPath();
+    ctx.ellipse(-len, 0, 6*s, 6*s, 0, 0, Math.PI*2);
+    ctx.ellipse(-len, -6*s, 5*s, 5*s, 0, 0, Math.PI*2);
+    ctx.ellipse(-len, 6*s, 5*s, 5*s, 0, 0, Math.PI*2);
+    ctx.ellipse(len, 0, 6*s, 6*s, 0, 0, Math.PI*2);
+    ctx.ellipse(len, -6*s, 5*s, 5*s, 0, 0, Math.PI*2);
+    ctx.ellipse(len, 6*s, 5*s, 5*s, 0, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#fef3c7';
+    ctx.fillRect(-len, -5*s, len * 2, 10*s);
+    ctx.strokeRect(-len, -5*s, len * 2, 10*s);
     ctx.restore();
   }
 
-  // ====== Game loop ======
+  function drawPlayer() {
+    const px = game.laneAnim;
+    const p = project(px, game.y, 0.5);
+    const pose = game.jumping || game.y > 0 ? 'jump' : (game.sliding > 0 ? 'slide' : 'run');
+    drawDino(ctx, p.x, p.y - 18, 1.4 * (W / 1200 + 0.5), game.dino, pose, game.tick * 2);
+  }
+
+  function render() {
+    drawSky();
+    drawGround();
+
+    // Collect all renderables, sort by z (far to near)
+    const items = [];
+    for (const d of game.decor) items.push({ z: d.z, draw: () => drawDecor(d) });
+    for (const o of game.obstacles) items.push({ z: o.z, draw: () => drawObstacle(o) });
+    for (const b of game.bones) items.push({ z: b.z, draw: () => drawBone(b) });
+    items.sort((a, b) => b.z - a.z);
+    for (const it of items) it.draw();
+
+    // Player (always near)
+    drawPlayer();
+
+    if (game.hitFlash > 0) {
+      ctx.fillStyle = `rgba(255,0,0,${game.hitFlash / 500})`;
+      ctx.fillRect(0, 0, W, H);
+    }
+  }
+
+  // ====== Loop ======
   let last = performance.now();
   function loop() {
     const now = performance.now();
     const dt = Math.min(50, now - last);
     last = now;
-    if (game && !game.over) update(dt);
-    if (game) render();
+    if (game) {
+      if (!game.over) update(dt);
+      render();
+    }
     requestAnimationFrame(loop);
   }
   loop();
 
-  // ====== UI buttons ======
+  // ====== UI ======
   document.getElementById('btnPlay').addEventListener('click', () => {
     game = createGame();
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('hud').classList.remove('hidden');
-    // Show mobile controls if touch
-    if (matchMedia('(hover: none)').matches) {
-      document.getElementById('joyMove').classList.remove('hidden');
-      document.getElementById('btnShoot').classList.remove('hidden');
-      document.getElementById('btnSuper').classList.remove('hidden');
-    }
+    document.getElementById('hint').classList.remove('hidden');
+    document.getElementById('touchZone').classList.remove('hidden');
   });
   document.getElementById('btnRestart').addEventListener('click', () => {
     game = createGame();
     document.getElementById('endScreen').classList.add('hidden');
+    document.getElementById('hud').classList.remove('hidden');
+    document.getElementById('hint').classList.remove('hidden');
+    document.getElementById('touchZone').classList.remove('hidden');
   });
 })();
 </script>
