@@ -322,13 +322,11 @@
   // ====== Projection ======
   function project(worldX, worldY, z) {
     const horizonY = H * HORIZON;
-    const groundDepth = H - horizonY;
-    // z=0 -> bottom, z=FAR_Z -> horizon
-    const t = Math.min(1, z / FAR_Z);
-    // Use 1/(1+z*k) for nice perspective
     const k = 0.04;
-    const scale = 1 / (1 + z * k);
-    const screenY = horizonY + groundDepth * (1 - scale) / (1 - 1/(1+FAR_Z*k)) ;
+    const scale = 1 / (1 + Math.max(0, z) * k);
+    // z=0 (near) -> screenY = H (bottom)
+    // z=FAR_Z (far) -> screenY -> horizonY
+    const screenY = horizonY + (H - horizonY) * scale;
     const cx = W / 2;
     const screenX = cx + worldX * (W * 0.18) * scale;
     return { x: screenX, y: screenY - worldY * scale * (H * 0.22), scale };
